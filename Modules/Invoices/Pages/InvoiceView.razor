@@ -11,7 +11,7 @@
 else
 {
     <div class="flex items-center justify-between">
-        <a href="/invoices" class="text-sm font-medium text-slate-500 transition hover:text-slate-800">&larr; Back to Invoices</a>
+        <a href="/invoices" class="back-link">&larr; Back to Invoices</a>
         <div class="flex gap-3">
             <a href="@($"/invoices/{Id}/edit")" class="btn-secondary">Edit</a>
             <a href="@($"/invoices/{Id}/pdf")" target="_blank" class="btn-primary">Download PDF</a>
@@ -21,21 +21,21 @@ else
     <div class="card mx-auto mt-6 max-w-3xl p-8">
         <div class="flex items-start justify-between">
             <div>
-                <h1 class="text-2xl font-bold tracking-tight text-slate-800">INVOICE</h1>
-                <p class="mt-1 text-sm text-slate-500">@_invoice.InvoiceNumber</p>
+                <h1 class="page-title">INVOICE</h1>
+                <p class="page-subtitle">@_invoice.InvoiceNumber</p>
             </div>
             <div class="text-right">
-                <p class="text-xs font-medium uppercase text-slate-400">Invoice Date</p>
-                <p class="text-sm font-semibold text-slate-800">@_invoice.InvoiceDate.ToString("MMM dd, yyyy")</p>
-                <p class="mt-2 text-xs font-medium uppercase text-slate-400">Due Date</p>
-                <p class="text-sm font-semibold text-red-500">@_invoice.DueDate.ToString("MMM dd, yyyy")</p>
+                <p class="eyebrow">Invoice Date</p>
+                <p class="text-sm font-semibold text-slate-900">@_invoice.InvoiceDate.ToString("MMM dd, yyyy")</p>
+                <p class="eyebrow mt-2">Due Date</p>
+                <p class="text-sm font-semibold @(_invoice.DueDate < DateOnly.FromDateTime(DateTime.Today) ? "text-red-600" : "text-slate-900")">@_invoice.DueDate.ToString("MMM dd, yyyy")</p>
             </div>
         </div>
 
         <div class="mt-6 grid grid-cols-2 gap-4">
             <div class="rounded-lg bg-slate-50 p-4">
-                <p class="text-xs font-semibold uppercase text-slate-400">From</p>
-                <p class="mt-1 font-semibold text-slate-800">@_invoice.Sender.Name</p>
+                <p class="eyebrow">From</p>
+                <p class="mt-1 font-semibold text-slate-900">@_invoice.Sender.Name</p>
                 @if (!string.IsNullOrWhiteSpace(_invoice.Sender.ContactPerson))
                 {
                     <p class="text-sm text-slate-600">@_invoice.Sender.ContactPerson</p>
@@ -50,9 +50,9 @@ else
                     <p class="text-xs text-slate-500">IBAN: @_invoice.Sender.Iban</p>
                 }
             </div>
-            <div class="rounded-lg bg-blue-50 p-4">
-                <p class="text-xs font-semibold uppercase text-blue-500">Bill To</p>
-                <p class="mt-1 font-semibold text-slate-800">@_invoice.Customer.Name</p>
+            <div class="rounded-lg bg-brand-50 p-4">
+                <p class="eyebrow text-brand-600">Bill To</p>
+                <p class="mt-1 font-semibold text-slate-900">@_invoice.Customer.Name</p>
                 @if (!string.IsNullOrWhiteSpace(_invoice.Customer.ContactPerson))
                 {
                     <p class="text-sm text-slate-600">@_invoice.Customer.ContactPerson</p>
@@ -71,11 +71,11 @@ else
 
         <table class="mt-6 w-full text-sm">
             <thead>
-                <tr class="bg-slate-800 text-white">
-                    <th class="rounded-l-lg px-3 py-2 text-left font-medium">Item Description</th>
-                    <th class="px-3 py-2 text-right font-medium">Quantity</th>
-                    <th class="px-3 py-2 text-right font-medium">Unit Price</th>
-                    <th class="rounded-r-lg px-3 py-2 text-right font-medium">Total</th>
+                <tr class="border-b border-slate-200 bg-slate-50">
+                    <th class="eyebrow rounded-l-lg px-3 py-2.5 text-left text-slate-500">Item Description</th>
+                    <th class="eyebrow px-3 py-2.5 text-right text-slate-500">Quantity</th>
+                    <th class="eyebrow px-3 py-2.5 text-right text-slate-500">Unit Price</th>
+                    <th class="eyebrow rounded-r-lg px-3 py-2.5 text-right text-slate-500">Total</th>
                 </tr>
             </thead>
             <tbody>
@@ -102,17 +102,17 @@ else
                     <span class="font-medium text-slate-800">@_invoice.TaxAmount.ToString("N2") @_invoice.Currency</span>
                 </div>
                 <div class="mt-1 flex justify-between border-t border-slate-200 pt-2">
-                    <span class="font-semibold text-slate-800">Total Amount</span>
-                    <span class="text-lg font-bold text-indigo-600">@_invoice.Total.ToString("N2") @_invoice.Currency</span>
+                    <span class="font-semibold text-slate-900">Total Amount</span>
+                    <span class="text-lg font-bold text-brand-600">@_invoice.Total.ToString("N2") @_invoice.Currency</span>
                 </div>
             </div>
         </div>
 
         @if (!string.IsNullOrWhiteSpace(_invoice.Notes))
         {
-            <div class="mt-6 rounded-lg border-l-4 border-yellow-400 bg-yellow-50 p-4">
-                <p class="text-xs font-semibold uppercase text-yellow-700">Notes</p>
-                <p class="mt-1 text-sm text-yellow-800">@_invoice.Notes</p>
+            <div class="mt-6 rounded-lg border-l-4 border-amber-400 bg-amber-50 p-4">
+                <p class="eyebrow text-amber-700">Notes</p>
+                <p class="mt-1 text-sm text-amber-800">@_invoice.Notes</p>
             </div>
         }
     </div>

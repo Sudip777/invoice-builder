@@ -25,7 +25,7 @@
             <DataAnnotationsValidator />
 
             <div class="card p-6">
-                <h3 class="text-sm font-semibold tracking-wide text-slate-900">Invoice details</h3>
+                <h3 class="card-title">Invoice details</h3>
                 <div class="mt-4 space-y-4">
                     <div class="grid grid-cols-2 gap-4">
                         <div>
@@ -83,7 +83,7 @@
                     <div class="w-44">
                         <label class="form-label">Tax Rate (%)</label>
                         <MudNumericField T="decimal" @bind-Value="_model.TaxRate" @bind-Value:after="StateHasChanged"
-                                         Min="0" Max="100" Format="N2" Variant="Variant.Outlined" Margin="Margin.Dense" Class="mt-1.5" />
+                                         Min="0" Max="100" Format="N2" Variant="Variant.Outlined" Margin="Margin.Dense" Class="ib-field mt-1.5" />
                     </div>
 
                     <div>
@@ -95,13 +95,13 @@
 
             <div class="card mt-6 p-6">
                 <div class="flex items-center justify-between">
-                    <h3 class="text-sm font-semibold tracking-wide text-slate-900">Line items</h3>
+                    <h3 class="card-title">Line items</h3>
                     <button type="button" @onclick="AddItem" class="btn-secondary px-3 py-1.5">+ Add Item</button>
                 </div>
 
                 @if (_model.LineItems.Count > 0)
                 {
-                    <div class="mt-4 flex items-center gap-3 text-xs font-semibold uppercase tracking-wide text-slate-400">
+                    <div class="eyebrow mt-4 flex items-center gap-3">
                         <span class="flex-1">Description</span>
                         <span class="w-24 text-right">Qty</span>
                         <span class="w-28 text-right">Unit Price</span>
@@ -117,8 +117,8 @@
                     }
                     @if (_model.LineItems.Count == 0)
                     {
-                        <div class="rounded-xl border border-dashed border-slate-300 py-8 text-center">
-                            <p class="text-sm text-slate-400">No line items yet — add your first one.</p>
+                        <div class="empty-state rounded-xl border border-dashed border-slate-300 py-8">
+                            <p class="empty-state-hint mt-0">No line items yet — add your first one.</p>
                             <button type="button" @onclick="AddItem" class="btn-secondary mt-3 px-3 py-1.5">+ Add Item</button>
                         </div>
                     }

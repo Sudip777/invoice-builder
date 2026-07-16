@@ -43,7 +43,7 @@
                 <CellTemplate>
                     <div class="flex justify-end gap-4">
                         <a href="@($"/invoices/{context.Item.Id}")" class="row-action text-slate-600 hover:text-slate-900">View</a>
-                        <a href="@($"/invoices/{context.Item.Id}/edit")" class="row-action text-indigo-600 hover:text-indigo-500">Edit</a>
+                        <a href="@($"/invoices/{context.Item.Id}/edit")" class="row-action text-brand-600 hover:text-brand-500">Edit</a>
                         <a href="@($"/invoices/{context.Item.Id}/pdf")" target="_blank" class="row-action text-sky-600 hover:text-sky-500">PDF</a>
                         <button type="button" @onclick="() => Delete(context.Item)" class="btn-danger-ghost">Delete</button>
                     </div>
@@ -54,9 +54,9 @@
             <MudDataGridPager T="Invoice" />
         </PagerContent>
         <NoRecordsContent>
-            <div class="py-12 text-center">
-                <p class="text-sm font-medium text-slate-600">No invoices yet</p>
-                <p class="mt-1 text-sm text-slate-400">Create your first invoice to get started.</p>
+            <div class="empty-state">
+                <p class="empty-state-title">No invoices yet</p>
+                <p class="empty-state-hint">Create your first invoice to get started.</p>
                 <a href="/invoices/new" class="btn-primary mt-4">+ New Invoice</a>
             </div>
         </NoRecordsContent>

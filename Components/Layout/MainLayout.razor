@@ -1,6 +1,6 @@
 @inherits LayoutComponentBase
 
-<MudThemeProvider />
+<MudThemeProvider Theme="Theme" />
 <MudPopoverProvider />
 <MudDialogProvider />
 <MudSnackbarProvider />
@@ -13,26 +13,40 @@
 
     <footer class="border-t border-slate-200 bg-white">
         <div class="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-4 py-6 sm:flex-row sm:px-6">
-            <div class="flex items-center gap-2.5">
-                <div class="leading-tight">
-                    <NavLink href="" Match="NavLinkMatch.All" class="flex items-center gap-2.5">
-                        <span
-                        class="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-600 to-violet-600 text-sm font-bold text-white shadow-sm">IB</span>
-                        <span class="text-lg font-bold tracking-tight text-slate-900">Invoice<span
-                            class="text-indigo-600">Builder</span></span>
-                        </NavLink>
-                        <span class="block text-xs text-slate-400">Create, manage &amp; export invoices.</span>
-                    </div>
-                </div>
-                <p class="text-xs text-slate-400">
-                    &copy; @DateTime.Now.Year InvoiceBuilder. All rights reserved.
-                </p>
+            <div class="leading-tight">
+                <NavLink href="" Match="NavLinkMatch.All" class="flex items-center gap-2.5">
+                    <span class="brand-mark">IB</span>
+                    <span class="text-lg font-bold tracking-tight text-slate-900">Invoice<span class="text-brand-600">Builder</span></span>
+                </NavLink>
+                <span class="mt-1 block text-xs text-slate-400">Create, manage &amp; export invoices.</span>
             </div>
-        </footer>
-    </div>
+            <p class="text-xs text-slate-400">
+                &copy; @DateTime.Now.Year InvoiceBuilder. All rights reserved.
+            </p>
+        </div>
+    </footer>
+</div>
 
-    <div id="blazor-error-ui" data-nosnippet>
-        An unhandled error has occurred.
-        <a href="." class="reload">Reload</a>
-        <span class="dismiss">🗙</span>
-    </div>
+<div id="blazor-error-ui" data-nosnippet>
+    An unhandled error has occurred.
+    <a href="." class="reload">Reload</a>
+    <span class="dismiss">🗙</span>
+</div>
+
+@code {
+    // MudBlazor palette aligned to the design system in app.css, so Mud-rendered
+    // chrome (grid pager, focus states, progress bars) uses the brand colors
+    // instead of Material's defaults.
+    private static readonly MudTheme Theme = new()
+    {
+        PaletteLight = new PaletteLight
+        {
+            Primary = "#4f46e5",   // brand-600
+            Secondary = "#7c3aed", // violet-600 (gradient companion)
+            Info = "#4f46e5",
+            Success = "#059669",   // emerald-600
+            Warning = "#d97706",   // amber-600
+            Error = "#dc2626",     // red-600
+        },
+    };
+}

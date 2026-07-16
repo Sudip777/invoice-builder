@@ -5,10 +5,10 @@
            class="form-input mt-0 flex-1" />
 
     <MudNumericField T="decimal" @bind-Value="Item.Quantity" @bind-Value:after="NotifyChanged" Min="0" Format="N2"
-                      Variant="Variant.Outlined" Margin="Margin.Dense" Class="w-24" />
+                      Variant="Variant.Outlined" Margin="Margin.Dense" Class="ib-field w-24" />
 
     <MudNumericField T="decimal" @bind-Value="Item.UnitPrice" @bind-Value:after="NotifyChanged" Min="0" Format="N2"
-                      Variant="Variant.Outlined" Margin="Margin.Dense" Class="w-28" />
+                      Variant="Variant.Outlined" Margin="Margin.Dense" Class="ib-field w-28" />
 
     <div class="w-28 shrink-0 text-right text-sm font-semibold text-slate-800">
         @Item.LineTotal.ToString("N2")

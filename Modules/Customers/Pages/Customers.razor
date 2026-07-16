@@ -23,7 +23,7 @@
             <TemplateColumn T="Customer" Title="" Sortable="false">
                 <CellTemplate Context="context">
                     <div class="flex justify-end gap-4">
-                        <a href="@($"/customers/{context.Item.Id}/edit")" class="row-action text-indigo-600 hover:text-indigo-500">Edit</a>
+                        <a href="@($"/customers/{context.Item.Id}/edit")" class="row-action text-brand-600 hover:text-brand-500">Edit</a>
                         <button type="button" @onclick="() => Delete(context.Item)" class="btn-danger-ghost">Delete</button>
                     </div>
                 </CellTemplate>
@@ -33,9 +33,9 @@
             <MudDataGridPager T="Customer" />
         </PagerContent>
         <NoRecordsContent>
-            <div class="py-12 text-center">
-                <p class="text-sm font-medium text-slate-600">No customers yet</p>
-                <p class="mt-1 text-sm text-slate-400">Add the first person or company you bill.</p>
+            <div class="empty-state">
+                <p class="empty-state-title">No customers yet</p>
+                <p class="empty-state-hint">Add the first person or company you bill.</p>
                 <a href="/customers/new" class="btn-primary mt-4">+ New Customer</a>
             </div>
         </NoRecordsContent>

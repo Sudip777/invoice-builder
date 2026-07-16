@@ -1,28 +1,31 @@
-﻿@page "/Error"
+@page "/Error"
 @using System.Diagnostics
 
-<PageTitle>Error</PageTitle>
+<PageTitle>Error · Invoice Builder</PageTitle>
 
-<h1 class="text-danger">Error.</h1>
-<h2 class="text-danger">An error occurred while processing your request.</h2>
+<div class="mx-auto max-w-2xl">
+    <span class="badge badge-red">Error</span>
+    <h1 class="page-title mt-3">Something went wrong.</h1>
+    <p class="page-subtitle">An error occurred while processing your request. Try again, or head back home.</p>
 
-@if (ShowRequestId)
-{
-    <p>
-        <strong>Request ID:</strong> <code>@RequestId</code>
-    </p>
-}
+    @if (ShowRequestId)
+    {
+        <div class="card mt-6 p-6">
+            <p class="eyebrow">Request ID</p>
+            <code class="mt-1 block font-mono text-sm text-slate-700">@RequestId</code>
+            <p class="mt-3 text-xs text-slate-400">
+                Share this ID with your administrator to help track down the error.
+                Detailed error information is only shown when the app runs in the
+                <strong>Development</strong> environment.
+            </p>
+        </div>
+    }
 
-<h3>Development Mode</h3>
-<p>
-    Swapping to <strong>Development</strong> environment will display more detailed information about the error that occurred.
-</p>
-<p>
-    <strong>The Development environment shouldn't be enabled for deployed applications.</strong>
-    It can result in displaying sensitive information from exceptions to end users.
-    For local debugging, enable the <strong>Development</strong> environment by setting the <strong>ASPNETCORE_ENVIRONMENT</strong> environment variable to <strong>Development</strong>
-    and restarting the app.
-</p>
+    <div class="mt-6 flex gap-3">
+        <a href="/" class="btn-primary">Back to home</a>
+        <a href="/invoices" class="btn-secondary">Go to invoices</a>
+    </div>
+</div>
 
 @code{
     [CascadingParameter]
