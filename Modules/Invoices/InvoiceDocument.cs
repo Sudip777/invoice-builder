@@ -3,7 +3,7 @@ using QuestPDF.Fluent;
 using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
 
-namespace InvoiceBuilder.Services;
+namespace InvoiceBuilder.Modules.Invoices;
 
 public class InvoiceDocument(Invoice invoice) : IDocument
 {

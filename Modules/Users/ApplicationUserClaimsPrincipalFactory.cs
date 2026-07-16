@@ -3,7 +3,7 @@ using InvoiceBuilder.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 
-namespace InvoiceBuilder.Services;
+namespace InvoiceBuilder.Modules.Users;
 
 /// <summary>
 /// Adds a stable "display_name" claim so the UI can show a friendly name

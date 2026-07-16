@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Components.Server;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 
-namespace InvoiceBuilder.Components.Account;
+namespace InvoiceBuilder.Modules.Users;
 
 /// <summary>
 /// Periodically re-checks the signed-in user's security stamp against the

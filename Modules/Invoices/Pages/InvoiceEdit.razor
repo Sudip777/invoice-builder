@@ -1,8 +1,6 @@
 @page "/invoices/new"
 @page "/invoices/{Id:int}/edit"
 @inject InvoiceService InvoiceSvc
-@inject CustomerService Customers
-@inject SenderService Senders
 @inject NavigationManager Nav
 @inject ISnackbar Snackbar
 
@@ -145,8 +143,8 @@
 
     protected override async Task OnInitializedAsync()
     {
-        _customers = await Customers.GetAllAsync();
-        _senders = await Senders.GetAllAsync();
+        _customers = await InvoiceSvc.GetCustomersAsync();
+        _senders = await InvoiceSvc.GetSendersAsync();
 
         if (Id is int id)
         {

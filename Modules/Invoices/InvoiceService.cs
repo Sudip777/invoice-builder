@@ -2,7 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using InvoiceBuilder.Data;
 using InvoiceBuilder.Models;
 
-namespace InvoiceBuilder.Services;
+namespace InvoiceBuilder.Modules.Invoices;
 
 public class InvoiceService(IDbContextFactory<ApplicationDbContext> factory)
 {
@@ -27,6 +27,20 @@ public class InvoiceService(IDbContextFactory<ApplicationDbContext> factory)
             .Include(i => i.LineItems)
             .AsNoTracking()
             .FirstOrDefaultAsync(i => i.Id == id);
+    }
+
+    // Dropdown lookups for the invoice editor; owned by this slice so it
+    // doesn't depend on the Customers/Senders modules.
+    public async Task<List<Customer>> GetCustomersAsync()
+    {
+        await using var db = factory.CreateDbContext();
+        return await db.Customers.AsNoTracking().OrderBy(c => c.Name).ToListAsync();
+    }
+
+    public async Task<List<Sender>> GetSendersAsync()
+    {
+        await using var db = factory.CreateDbContext();
+        return await db.Senders.AsNoTracking().OrderBy(s => s.Name).ToListAsync();
     }
 
     public async Task<int> CreateAsync(Invoice invoice)

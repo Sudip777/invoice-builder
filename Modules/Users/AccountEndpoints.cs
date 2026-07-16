@@ -1,10 +1,9 @@
 using System.Security.Claims;
 using InvoiceBuilder.Models;
-using InvoiceBuilder.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
-namespace InvoiceBuilder.Components.Account;
+namespace InvoiceBuilder.Modules.Users;
 
 /// <summary>
 /// External-login-only auth endpoints. Kept as plain minimal APIs (rather

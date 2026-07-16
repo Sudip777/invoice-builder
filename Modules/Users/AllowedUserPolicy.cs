@@ -1,4 +1,4 @@
-namespace InvoiceBuilder.Services;
+namespace InvoiceBuilder.Modules.Users;
 
 /// <summary>
 /// Gatekeeper for external sign-in: only emails on the configured allow-list

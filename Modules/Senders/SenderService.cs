@@ -2,7 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using InvoiceBuilder.Data;
 using InvoiceBuilder.Models;
 
-namespace InvoiceBuilder.Services;
+namespace InvoiceBuilder.Modules.Senders;
 
 public class SenderService(IDbContextFactory<ApplicationDbContext> factory)
 {

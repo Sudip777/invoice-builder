@@ -1,8 +1,10 @@
 using InvoiceBuilder.Components;
-using InvoiceBuilder.Components.Account;
 using InvoiceBuilder.Data;
 using InvoiceBuilder.Models;
-using InvoiceBuilder.Services;
+using InvoiceBuilder.Modules.Customers;
+using InvoiceBuilder.Modules.Invoices;
+using InvoiceBuilder.Modules.Senders;
+using InvoiceBuilder.Modules.Users;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -19,7 +21,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContextFactory<ApplicationDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// Data-access services
+// Module services (one per vertical slice — see Modules/)
 builder.Services.AddScoped<SenderService>();
 builder.Services.AddScoped<CustomerService>();
 builder.Services.AddScoped<InvoiceService>();

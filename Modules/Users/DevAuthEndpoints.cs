@@ -2,7 +2,7 @@ using InvoiceBuilder.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
-namespace InvoiceBuilder.Components.Account;
+namespace InvoiceBuilder.Modules.Users;
 
 /// <summary>
 /// Development-only shortcut that signs in the seeded test user without a
