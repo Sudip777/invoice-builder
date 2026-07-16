@@ -1,0 +1,32 @@
+@using System.Reflection
+
+<Router AppAssembly="typeof(Program).Assembly">
+    <Found Context="routeData">
+        @if (AllowsAnonymous(routeData.PageType))
+        {
+            <RouteView RouteData="routeData" DefaultLayout="typeof(Layout.MainLayout)" />
+        }
+        else
+        {
+            <AuthorizeView>
+                <Authorized>
+                    <RouteView RouteData="routeData" DefaultLayout="typeof(Layout.MainLayout)" />
+                </Authorized>
+                <NotAuthorized>
+                    <RedirectToLogin />
+                </NotAuthorized>
+            </AuthorizeView>
+        }
+        <FocusOnNavigate RouteData="routeData" Selector="h1" />
+    </Found>
+</Router>
+
+@code {
+    // AuthorizeRouteView only enforces authorization on pages that declare
+    // their own [Authorize] data — it silently allows anything else through,
+    // which isn't "secure by default". AuthorizeView's bare (no Policy/Roles)
+    // check already defaults to requiring an authenticated user, so route
+    // everything through that unless the page opts out with [AllowAnonymous].
+    private static bool AllowsAnonymous(Type pageType) =>
+        pageType.GetCustomAttribute<AllowAnonymousAttribute>(inherit: true) is not null;
+}

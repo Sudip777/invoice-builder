@@ -1,0 +1,102 @@
+@page "/invoices"
+@inject InvoiceService InvoiceSvc
+@inject NavigationManager Nav
+@inject ISnackbar Snackbar
+
+<PageTitle>Invoices · Invoice Builder</PageTitle>
+
+<div class="flex items-center justify-between">
+    <div>
+        <h1 class="page-title">Invoices</h1>
+        <p class="page-subtitle">Create, preview, and download your invoices.</p>
+    </div>
+    <a href="/invoices/new" class="btn-primary">+ New Invoice</a>
+</div>
+
+<div class="card mt-6 overflow-hidden p-2">
+    <MudDataGrid Items="@_rows" Dense="true" Hover="true" Loading="@_loading" SortMode="SortMode.Single" Class="ib-grid">
+        <Columns>
+            <PropertyColumn Property="i => i.InvoiceNumber" Title="Invoice #" />
+            <PropertyColumn Property="i => i.Customer.Name" Title="Customer" />
+            <PropertyColumn Property="i => i.InvoiceDate" Title="Date" Format="MMM dd, yyyy" />
+            <TemplateColumn Title="Due" SortBy="i => i.DueDate">
+                <CellTemplate>
+                    <div class="flex items-center gap-2">
+                        <span>@context.Item.DueDate.ToString("MMM dd, yyyy")</span>
+                        @if (context.Item.DueDate < DateOnly.FromDateTime(DateTime.Today))
+                        {
+                            <span class="badge badge-red">Overdue</span>
+                        }
+                        else if (context.Item.DueDate <= DateOnly.FromDateTime(DateTime.Today).AddDays(7))
+                        {
+                            <span class="badge badge-amber">Due soon</span>
+                        }
+                    </div>
+                </CellTemplate>
+            </TemplateColumn>
+            <TemplateColumn Title="Total" Sortable="false">
+                <CellTemplate>
+                    <span class="font-semibold text-slate-900">@context.Item.Total.ToString("N2") <span class="text-xs font-medium text-slate-400">@context.Item.Currency</span></span>
+                </CellTemplate>
+            </TemplateColumn>
+            <TemplateColumn Title="" Sortable="false">
+                <CellTemplate>
+                    <div class="flex justify-end gap-4">
+                        <a href="@($"/invoices/{context.Item.Id}")" class="row-action text-slate-600 hover:text-slate-900">View</a>
+                        <a href="@($"/invoices/{context.Item.Id}/edit")" class="row-action text-indigo-600 hover:text-indigo-500">Edit</a>
+                        <a href="@($"/invoices/{context.Item.Id}/pdf")" target="_blank" class="row-action text-sky-600 hover:text-sky-500">PDF</a>
+                        <button type="button" @onclick="() => Delete(context.Item)" class="btn-danger-ghost">Delete</button>
+                    </div>
+                </CellTemplate>
+            </TemplateColumn>
+        </Columns>
+        <PagerContent>
+            <MudDataGridPager T="Invoice" />
+        </PagerContent>
+        <NoRecordsContent>
+            <div class="py-12 text-center">
+                <p class="text-sm font-medium text-slate-600">No invoices yet</p>
+                <p class="mt-1 text-sm text-slate-400">Create your first invoice to get started.</p>
+                <a href="/invoices/new" class="btn-primary mt-4">+ New Invoice</a>
+            </div>
+        </NoRecordsContent>
+    </MudDataGrid>
+</div>
+
+<ConfirmDialog @ref="_confirm" />
+
+@code {
+    private ConfirmDialog _confirm = default!;
+    private List<Invoice> _rows = new();
+    private bool _loading = true;
+
+    protected override async Task OnInitializedAsync() => await Reload();
+
+    private async Task Reload()
+    {
+        _loading = true;
+        _rows = await InvoiceSvc.GetAllAsync();
+        _loading = false;
+    }
+
+    private async Task Delete(Invoice invoice)
+    {
+        var confirmed = await _confirm.ShowAsync(
+            $"Remove invoice \"{invoice.InvoiceNumber}\"? This can't be undone.",
+            title: "Delete invoice?", confirmText: "Delete");
+
+        if (confirmed)
+        {
+            try
+            {
+                await InvoiceSvc.DeleteAsync(invoice.Id);
+                Snackbar.Add("Invoice deleted", Severity.Success);
+                await Reload();
+            }
+            catch (Exception ex)
+            {
+                Snackbar.Add($"Could not delete: {ex.Message}", Severity.Error);
+            }
+        }
+    }
+}

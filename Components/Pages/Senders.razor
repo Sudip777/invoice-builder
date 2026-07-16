@@ -1,0 +1,81 @@
+@page "/senders"
+@inject SenderService SenderSvc
+@inject NavigationManager Nav
+@inject ISnackbar Snackbar
+
+<PageTitle>Senders · Invoice Builder</PageTitle>
+
+<div class="flex items-center justify-between">
+    <div>
+        <h1 class="page-title">Senders</h1>
+        <p class="page-subtitle">The companies you send invoices from.</p>
+    </div>
+    <a href="/senders/new" class="btn-primary">+ New Sender</a>
+</div>
+
+<div class="card mt-6 overflow-hidden p-2">
+    <MudDataGrid Items="@_rows" Dense="true" Hover="true" Loading="@_loading" SortMode="SortMode.Single" Class="ib-grid">
+        <Columns>
+            <PropertyColumn Property="s => s.Name" Title="Name" />
+            <PropertyColumn Property="s => s.ContactPerson" Title="Contact" />
+            <PropertyColumn Property="s => s.Address" Title="Address" />
+            <PropertyColumn Property="s => s.VatId" Title="VAT / Tax ID" />
+            <TemplateColumn Title="" Sortable="false">
+                <CellTemplate>
+                    <div class="flex justify-end gap-4">
+                        <a href="@($"/senders/{context.Item.Id}/edit")" class="row-action text-indigo-600 hover:text-indigo-500">Edit</a>
+                        <button type="button" @onclick="() => Delete(context.Item)" class="btn-danger-ghost">Delete</button>
+                    </div>
+                </CellTemplate>
+            </TemplateColumn>
+        </Columns>
+        <PagerContent>
+            <MudDataGridPager T="Sender" />
+        </PagerContent>
+        <NoRecordsContent>
+            <div class="py-12 text-center">
+                <p class="text-sm font-medium text-slate-600">No senders yet</p>
+                <p class="mt-1 text-sm text-slate-400">Add the first business you invoice from.</p>
+                <a href="/senders/new" class="btn-primary mt-4">+ New Sender</a>
+            </div>
+        </NoRecordsContent>
+    </MudDataGrid>
+</div>
+
+<ConfirmDialog @ref="_confirm" />
+
+@code {
+    private ConfirmDialog _confirm = default!;
+    private List<Sender> _rows = new();
+    private bool _loading = true;
+
+    protected override async Task OnInitializedAsync() => await Reload();
+
+    private async Task Reload()
+    {
+        _loading = true;
+        _rows = await SenderSvc.GetAllAsync();
+        _loading = false;
+    }
+
+    private async Task Delete(Sender sender)
+    {
+        var confirmed = await _confirm.ShowAsync(
+            $"Remove \"{sender.Name}\"? This can't be undone.",
+            title: "Delete sender?", confirmText: "Delete");
+
+        if (confirmed)
+        {
+            try
+            {
+                await SenderSvc.DeleteAsync(sender.Id);
+                Snackbar.Add("Sender deleted", Severity.Success);
+                await Reload();
+            }
+            catch (Exception ex)
+            {
+                Snackbar.Add($"Could not delete: {ex.Message}", Severity.Error);
+            }
+        }
+    }
+}

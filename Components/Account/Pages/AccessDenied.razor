@@ -1,0 +1,20 @@
+@page "/access-denied"
+@layout InvoiceBuilder.Components.Layout.EmptyLayout
+@attribute [AllowAnonymous]
+
+<PageTitle>Access denied — InvoiceBuilder</PageTitle>
+
+<div class="w-full max-w-sm text-center">
+    <span class="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-red-50 text-red-600 shadow-sm">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="h-6 w-6">
+            <path fill-rule="evenodd" d="M18 10a8 8 0 1 1-16 0 8 8 0 0 1 16 0ZM8.28 7.22a.75.75 0 0 0-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 1 0 1.06 1.06L10 11.06l1.72 1.72a.75.75 0 1 0 1.06-1.06L11.06 10l1.72-1.72a.75.75 0 0 0-1.06-1.06L10 8.94 8.28 7.22Z" clip-rule="evenodd" />
+        </svg>
+    </span>
+
+    <h1 class="mt-4 text-xl font-bold tracking-tight text-slate-900">Access denied</h1>
+    <p class="page-subtitle">
+        This account isn't authorized to use InvoiceBuilder. Contact your administrator if you believe this is a mistake.
+    </p>
+
+    <a href="/login" class="btn-secondary mt-6 inline-flex">Back to sign in</a>
+</div>

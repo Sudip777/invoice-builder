@@ -1,0 +1,81 @@
+@page "/senders/new"
+@page "/senders/{Id:int}/edit"
+@inject SenderService Senders
+@inject NavigationManager Nav
+@inject ISnackbar Snackbar
+
+<PageTitle>@(Id is null ? "New Sender" : "Edit Sender") · Invoice Builder</PageTitle>
+
+<div class="mx-auto max-w-2xl">
+    <a href="/senders" class="text-sm font-medium text-slate-500 transition hover:text-slate-800">&larr; Back to Senders</a>
+    <h1 class="page-title mt-3">@(Id is null ? "New Sender" : "Edit Sender")</h1>
+    <p class="page-subtitle">Details used as the "From" block on your invoices.</p>
+
+    <EditForm Model="_model" OnValidSubmit="Save" class="card mt-6 space-y-4 p-6">
+        <DataAnnotationsValidator />
+
+        <div>
+            <label class="form-label" for="snd-name">Name</label>
+            <input id="snd-name" @bind="_model.Name" placeholder="e.g. My Company LLC" class="form-input" />
+            <ValidationMessage For="() => _model.Name" class="form-error" />
+        </div>
+
+        <div>
+            <label class="form-label" for="snd-contact">Contact Person</label>
+            <input id="snd-contact" @bind="_model.ContactPerson" placeholder="e.g. Alice Smith" class="form-input" />
+        </div>
+
+        <div>
+            <label class="form-label" for="snd-address">Address</label>
+            <textarea id="snd-address" @bind="_model.Address" rows="2" placeholder="Street, city, postal code" class="form-input"></textarea>
+            <ValidationMessage For="() => _model.Address" class="form-error" />
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+            <div>
+                <label class="form-label" for="snd-vat">VAT / Tax ID</label>
+                <input id="snd-vat" @bind="_model.VatId" class="form-input" />
+            </div>
+            <div>
+                <label class="form-label" for="snd-iban">IBAN</label>
+                <input id="snd-iban" @bind="_model.Iban" placeholder="XX00 0000 0000 0000 00" class="form-input" />
+            </div>
+        </div>
+
+        <div class="flex justify-end gap-3 border-t border-slate-100 pt-4">
+            <a href="/senders" class="btn-secondary">Cancel</a>
+            <button type="submit" class="btn-primary">Save Sender</button>
+        </div>
+    </EditForm>
+</div>
+
+@code {
+    [Parameter] public int? Id { get; set; }
+    private Sender _model = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (Id is int id)
+        {
+            _model = await Senders.GetAsync(id) ?? new();
+        }
+    }
+
+    private async Task Save()
+    {
+        try
+        {
+            if (_model.Id == 0)
+                await Senders.CreateAsync(_model);
+            else
+                await Senders.UpdateAsync(_model);
+
+            Snackbar.Add("Sender saved", Severity.Success);
+            Nav.NavigateTo("/senders");
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Could not save: {ex.Message}", Severity.Error);
+        }
+    }
+}

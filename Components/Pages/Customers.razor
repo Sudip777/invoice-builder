@@ -1,0 +1,81 @@
+@page "/customers"
+@inject CustomerService CustomerSvc
+@inject NavigationManager Nav
+@inject ISnackbar Snackbar
+
+<PageTitle>Customers · Invoice Builder</PageTitle>
+
+<div class="flex items-center justify-between">
+    <div>
+        <h1 class="page-title">Customers</h1>
+        <p class="page-subtitle">The people and companies you bill.</p>
+    </div>
+    <a href="/customers/new" class="btn-primary">+ New Customer</a>
+</div>
+
+<div class="card mt-6 overflow-hidden p-2">
+    <MudDataGrid Items="@_rows" Dense="true" Hover="true" Loading="@_loading" SortMode="SortMode.Single" Class="ib-grid">
+        <Columns>
+            <PropertyColumn Property="c => c.Name" Title="Name" />
+            <PropertyColumn Property="c => c.ContactPerson" Title="Contact" />
+            <PropertyColumn Property="c => c.Email" Title="Email" />
+            <PropertyColumn Property="c => c.VatId" Title="VAT / Tax ID" />
+            <TemplateColumn T="Customer" Title="" Sortable="false">
+                <CellTemplate Context="context">
+                    <div class="flex justify-end gap-4">
+                        <a href="@($"/customers/{context.Item.Id}/edit")" class="row-action text-indigo-600 hover:text-indigo-500">Edit</a>
+                        <button type="button" @onclick="() => Delete(context.Item)" class="btn-danger-ghost">Delete</button>
+                    </div>
+                </CellTemplate>
+            </TemplateColumn>
+        </Columns>
+        <PagerContent>
+            <MudDataGridPager T="Customer" />
+        </PagerContent>
+        <NoRecordsContent>
+            <div class="py-12 text-center">
+                <p class="text-sm font-medium text-slate-600">No customers yet</p>
+                <p class="mt-1 text-sm text-slate-400">Add the first person or company you bill.</p>
+                <a href="/customers/new" class="btn-primary mt-4">+ New Customer</a>
+            </div>
+        </NoRecordsContent>
+    </MudDataGrid>
+</div>
+
+<ConfirmDialog @ref="_confirm" />
+
+@code {
+    private ConfirmDialog _confirm = default!;
+    private List<Customer> _rows = new();
+    private bool _loading = true;
+
+    protected override async Task OnInitializedAsync() => await Reload();
+
+    private async Task Reload()
+    {
+        _loading = true;
+        _rows = await CustomerSvc.GetAllAsync();
+        _loading = false;
+    }
+
+    private async Task Delete(Customer customer)
+    {
+        var confirmed = await _confirm.ShowAsync(
+            $"Remove \"{customer.Name}\"? This can't be undone.",
+            title: "Delete customer?", confirmText: "Delete");
+
+        if (confirmed)
+        {
+            try
+            {
+                await CustomerSvc.DeleteAsync(customer.Id);
+                Snackbar.Add("Customer deleted", Severity.Success);
+                await Reload();
+            }
+            catch (Exception ex)
+            {
+                Snackbar.Add($"Could not delete: {ex.Message}", Severity.Error);
+            }
+        }
+    }
+}

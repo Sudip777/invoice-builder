@@ -1,0 +1,33 @@
+# Build results
+bin/
+obj/
+
+# Visual Studio / IDE
+.vs/
+*.user
+*.suo
+.vscode/
+
+# Claude Code config and skills
+.claude/
+
+# Node / Tailwind
+node_modules/
+
+# Generated Tailwind output (source is app.css in project root)
+wwwroot/app.css
+
+# SQLite database (recreated by migrations + seeding on startup)
+*.db
+*.db-shm
+*.db-wal
+
+# Logs and temp
+*.log
+[Tt]emp/
+publish/
+*.pubxml.user
+
+# OS files
+Thumbs.db
+.DS_Store

@@ -1,0 +1,61 @@
+@* Tailwind-native confirmation modal. Deliberately does NOT use MudBlazor's
+   dialog: MudBlazor's CSS lives in the low-priority `mudblazor` cascade layer
+   (see app.css), so Tailwind's Preflight resets in the `base` layer strip its
+   button/dialog styling. Styling this with our own design-system classes keeps
+   it consistent and immune to that conflict. *@
+@if (_visible)
+{
+    <div class="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div class="fixed inset-0 bg-slate-900/50" @onclick="Cancel"></div>
+        <div class="card relative z-10 w-full max-w-md p-6" role="dialog" aria-modal="true" aria-labelledby="confirm-title">
+            <h2 id="confirm-title" class="text-lg font-semibold text-slate-900">@_title</h2>
+            <p class="mt-2 text-sm text-slate-500">@_message</p>
+            <div class="mt-6 flex justify-end gap-3">
+                <button type="button" class="btn-secondary" @onclick="Cancel">@_cancelText</button>
+                <button type="button"
+                        class="inline-flex items-center justify-center gap-1.5 rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-red-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600 active:scale-[0.98] active:bg-red-700"
+                        @onclick="Confirm">
+                    @_confirmText
+                </button>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    private bool _visible;
+    private string _title = "Are you sure?";
+    private string _message = "";
+    private string _confirmText = "Confirm";
+    private string _cancelText = "Cancel";
+    private TaskCompletionSource<bool>? _tcs;
+
+    /// <summary>Shows the dialog and completes with the user's choice.</summary>
+    public Task<bool> ShowAsync(string message, string title = "Are you sure?", string confirmText = "Confirm", string cancelText = "Cancel")
+    {
+        _message = message;
+        _title = title;
+        _confirmText = confirmText;
+        _cancelText = cancelText;
+        _visible = true;
+
+        // Cancel any dangling prior prompt so its awaiter never hangs.
+        _tcs?.TrySetResult(false);
+        _tcs = new TaskCompletionSource<bool>();
+
+        StateHasChanged();
+        return _tcs.Task;
+    }
+
+    private void Confirm()
+    {
+        _visible = false;
+        _tcs?.TrySetResult(true);
+    }
+
+    private void Cancel()
+    {
+        _visible = false;
+        _tcs?.TrySetResult(false);
+    }
+}

@@ -1,0 +1,183 @@
+@page "/invoices/new"
+@page "/invoices/{Id:int}/edit"
+@inject InvoiceService InvoiceSvc
+@inject CustomerService Customers
+@inject SenderService Senders
+@inject NavigationManager Nav
+@inject ISnackbar Snackbar
+
+<PageTitle>@(Id is null ? "New Invoice" : "Edit Invoice") · Invoice Builder</PageTitle>
+
+<div class="flex items-center justify-between">
+    <div>
+        <h1 class="page-title">@(Id is null ? "New Invoice" : "Edit Invoice")</h1>
+        <p class="page-subtitle">Provide invoice details, select a customer and sender, and add line items.</p>
+    </div>
+    <div class="flex gap-3">
+        <a href="/invoices" class="btn-secondary">Cancel</a>
+        <button type="submit" form="invoice-form" class="btn-primary">
+            @(Id is null ? "Create Invoice" : "Save Changes")
+        </button>
+    </div>
+</div>
+
+<div class="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-3">
+    <div class="space-y-6 lg:col-span-2">
+        <EditForm id="invoice-form" Model="_model" OnValidSubmit="Save">
+            <DataAnnotationsValidator />
+
+            <div class="card p-6">
+                <h3 class="text-sm font-semibold tracking-wide text-slate-900">Invoice details</h3>
+                <div class="mt-4 space-y-4">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="form-label" for="inv-number">Invoice Number</label>
+                            <input id="inv-number" @bind="_model.InvoiceNumber" placeholder="e.g. INV-2026-014" class="form-input" />
+                            <ValidationMessage For="() => _model.InvoiceNumber" class="form-error" />
+                        </div>
+                        <div>
+                            <label class="form-label" for="inv-currency">Currency</label>
+                            <select id="inv-currency" @bind="_model.Currency" class="form-input">
+                                @foreach (var currency in _currencies)
+                                {
+                                    <option value="@currency">@currency</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="form-label" for="inv-date">Invoice Date</label>
+                            <InputDate id="inv-date" TValue="DateOnly" @bind-Value="_model.InvoiceDate" @bind-Value:after="StateHasChanged" class="form-input" />
+                        </div>
+                        <div>
+                            <label class="form-label" for="inv-due">Due Date</label>
+                            <InputDate id="inv-due" TValue="DateOnly" @bind-Value="_model.DueDate" @bind-Value:after="StateHasChanged" class="form-input" />
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="form-label" for="inv-customer">Customer</label>
+                            <select id="inv-customer" @bind="_model.CustomerId" class="form-input">
+                                <option value="0" disabled>Pick a customer…</option>
+                                @foreach (var c in _customers)
+                                {
+                                    <option value="@c.Id">@c.Name</option>
+                                }
+                            </select>
+                            <ValidationMessage For="() => _model.CustomerId" class="form-error" />
+                        </div>
+                        <div>
+                            <label class="form-label" for="inv-sender">Sender</label>
+                            <select id="inv-sender" @bind="_model.SenderId" class="form-input">
+                                <option value="0" disabled>Pick a sender…</option>
+                                @foreach (var s in _senders)
+                                {
+                                    <option value="@s.Id">@s.Name</option>
+                                }
+                            </select>
+                            <ValidationMessage For="() => _model.SenderId" class="form-error" />
+                        </div>
+                    </div>
+
+                    <div class="w-44">
+                        <label class="form-label">Tax Rate (%)</label>
+                        <MudNumericField T="decimal" @bind-Value="_model.TaxRate" @bind-Value:after="StateHasChanged"
+                                         Min="0" Max="100" Format="N2" Variant="Variant.Outlined" Margin="Margin.Dense" Class="mt-1.5" />
+                    </div>
+
+                    <div>
+                        <label class="form-label" for="inv-notes">Notes</label>
+                        <textarea id="inv-notes" @bind="_model.Notes" rows="2" placeholder="Payment terms, thank-you note…" class="form-input"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mt-6 p-6">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-sm font-semibold tracking-wide text-slate-900">Line items</h3>
+                    <button type="button" @onclick="AddItem" class="btn-secondary px-3 py-1.5">+ Add Item</button>
+                </div>
+
+                @if (_model.LineItems.Count > 0)
+                {
+                    <div class="mt-4 flex items-center gap-3 text-xs font-semibold uppercase tracking-wide text-slate-400">
+                        <span class="flex-1">Description</span>
+                        <span class="w-24 text-right">Qty</span>
+                        <span class="w-28 text-right">Unit Price</span>
+                        <span class="w-28 text-right">Total</span>
+                        <span class="w-14"></span>
+                    </div>
+                }
+
+                <div class="mt-2 space-y-3">
+                    @foreach (var item in _model.LineItems)
+                    {
+                        <LineItemRow Item="item" OnRemove="() => RemoveItem(item)" OnChanged="StateHasChanged" />
+                    }
+                    @if (_model.LineItems.Count == 0)
+                    {
+                        <div class="rounded-xl border border-dashed border-slate-300 py-8 text-center">
+                            <p class="text-sm text-slate-400">No line items yet — add your first one.</p>
+                            <button type="button" @onclick="AddItem" class="btn-secondary mt-3 px-3 py-1.5">+ Add Item</button>
+                        </div>
+                    }
+                </div>
+            </div>
+        </EditForm>
+    </div>
+
+    <div class="lg:col-span-1">
+        <div class="sticky top-24">
+            <InvoiceSummary Invoice="_model" />
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter] public int? Id { get; set; }
+    private Invoice _model = new();
+    private List<Customer> _customers = new();
+    private List<Sender> _senders = new();
+    private static readonly string[] _currencies = ["USD", "EUR", "GBP", "CHF", "AUD", "CAD", "INR", "NPR", "JPY"];
+
+    protected override async Task OnInitializedAsync()
+    {
+        _customers = await Customers.GetAllAsync();
+        _senders = await Senders.GetAllAsync();
+
+        if (Id is int id)
+        {
+            _model = await InvoiceSvc.GetAsync(id) ?? new();
+        }
+
+        if (string.IsNullOrWhiteSpace(_model.Currency) || !_currencies.Contains(_model.Currency))
+        {
+            _model.Currency = _currencies[0];
+        }
+    }
+
+    private void AddItem() => _model.LineItems.Add(new InvoiceLineItem { Quantity = 1 });
+
+    private void RemoveItem(InvoiceLineItem item) => _model.LineItems.Remove(item);
+
+    private async Task Save()
+    {
+        try
+        {
+            if (_model.Id == 0)
+                await InvoiceSvc.CreateAsync(_model);
+            else
+                await InvoiceSvc.UpdateAsync(_model);
+
+            Snackbar.Add("Invoice saved", Severity.Success);
+            Nav.NavigateTo("/invoices");
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Could not save: {ex.Message}", Severity.Error);
+        }
+    }
+}
