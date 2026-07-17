@@ -14,15 +14,16 @@
     <EditForm Model="_model" OnValidSubmit="Save" class="card mt-6 space-y-4 p-6">
         <DataAnnotationsValidator />
 
-        <div>
-            <label class="form-label" for="snd-name">Name</label>
-            <input id="snd-name" @bind="_model.Name" placeholder="e.g. My Company LLC" class="form-input" />
-            <ValidationMessage For="() => _model.Name" class="form-error" />
-        </div>
-
-        <div>
-            <label class="form-label" for="snd-contact">Contact Person</label>
-            <input id="snd-contact" @bind="_model.ContactPerson" placeholder="e.g. Alice Smith" class="form-input" />
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <div>
+                <label class="form-label" for="snd-name">Name</label>
+                <input id="snd-name" @bind="_model.Name" placeholder="e.g. My Company LLC" class="form-input" />
+                <ValidationMessage For="() => _model.Name" class="form-error" />
+            </div>
+            <div>
+                <label class="form-label" for="snd-contact">Contact Person</label>
+                <input id="snd-contact" @bind="_model.ContactPerson" placeholder="e.g. Alice Smith" class="form-input" />
+            </div>
         </div>
 
         <div>
@@ -31,7 +32,7 @@
             <ValidationMessage For="() => _model.Address" class="form-error" />
         </div>
 
-        <div class="grid grid-cols-2 gap-4">
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
                 <label class="form-label" for="snd-vat">VAT / Tax ID</label>
                 <input id="snd-vat" @bind="_model.VatId" class="form-input" />

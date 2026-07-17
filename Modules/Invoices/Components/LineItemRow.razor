@@ -1,20 +1,20 @@
 @namespace InvoiceBuilder.Modules.Invoices.Components
 
-<div class="flex items-center gap-3">
+<div class="flex flex-wrap items-center gap-3 sm:flex-nowrap">
     <input @bind="Item.Description" @bind:event="oninput" @bind:after="NotifyChanged" placeholder="Item description"
-           class="form-input mt-0 flex-1" />
+           class="form-input mt-0 w-full sm:w-auto sm:flex-1" />
 
     <MudNumericField T="decimal" @bind-Value="Item.Quantity" @bind-Value:after="NotifyChanged" Min="0" Format="N2"
-                      Variant="Variant.Outlined" Margin="Margin.Dense" Class="ib-field w-24" />
+                      Variant="Variant.Outlined" Margin="Margin.Dense" Class="ib-field w-20 sm:w-24" />
 
     <MudNumericField T="decimal" @bind-Value="Item.UnitPrice" @bind-Value:after="NotifyChanged" Min="0" Format="N2"
-                      Variant="Variant.Outlined" Margin="Margin.Dense" Class="ib-field w-28" />
+                      Variant="Variant.Outlined" Margin="Margin.Dense" Class="ib-field w-24 sm:w-28" />
 
-    <div class="w-28 shrink-0 text-right text-sm font-semibold text-slate-800">
+    <div class="min-w-0 flex-1 text-right text-sm font-semibold text-slate-800 sm:w-28 sm:flex-none">
         @Item.LineTotal.ToString("N2")
     </div>
 
-    <div class="flex w-14 shrink-0 justify-end">
+    <div class="flex shrink-0 justify-end sm:w-14">
         <button type="button" @onclick="Remove" title="Remove item"
                 class="rounded-lg p-1.5 text-slate-400 transition hover:bg-red-50 hover:text-red-600">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="h-4.5 w-4.5">

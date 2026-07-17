@@ -6,7 +6,7 @@
 
 <PageTitle>@(Id is null ? "New Invoice" : "Edit Invoice") · Invoice Builder</PageTitle>
 
-<div class="flex items-center justify-between">
+<div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
     <div>
         <h1 class="page-title">@(Id is null ? "New Invoice" : "Edit Invoice")</h1>
         <p class="page-subtitle">Provide invoice details, select a customer and sender, and add line items.</p>
@@ -27,7 +27,7 @@
             <div class="card p-6">
                 <h3 class="card-title">Invoice details</h3>
                 <div class="mt-4 space-y-4">
-                    <div class="grid grid-cols-2 gap-4">
+                    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                         <div>
                             <label class="form-label" for="inv-number">Invoice Number</label>
                             <input id="inv-number" @bind="_model.InvoiceNumber" placeholder="e.g. INV-2026-014" class="form-input" />
@@ -44,7 +44,7 @@
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-2 gap-4">
+                    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                         <div>
                             <label class="form-label" for="inv-date">Invoice Date</label>
                             <InputDate id="inv-date" TValue="DateOnly" @bind-Value="_model.InvoiceDate" @bind-Value:after="StateHasChanged" class="form-input" />
@@ -55,7 +55,7 @@
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-2 gap-4">
+                    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                         <div>
                             <label class="form-label" for="inv-customer">Customer</label>
                             <select id="inv-customer" @bind="_model.CustomerId" class="form-input">
@@ -101,7 +101,7 @@
 
                 @if (_model.LineItems.Count > 0)
                 {
-                    <div class="eyebrow mt-4 flex items-center gap-3">
+                    <div class="eyebrow mt-4 hidden items-center gap-3 sm:flex">
                         <span class="flex-1">Description</span>
                         <span class="w-24 text-right">Qty</span>
                         <span class="w-28 text-right">Unit Price</span>

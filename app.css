@@ -189,11 +189,11 @@
     }
 
     .ib-grid .mud-table-head .mud-table-cell {
-        @apply border-b border-slate-200 bg-slate-50 py-2.5 font-sans text-xs font-semibold tracking-wide text-slate-500 uppercase;
+        @apply border-b border-slate-200 bg-slate-50 px-5 py-2.5 font-sans text-xs font-semibold tracking-wide text-slate-500 uppercase;
     }
 
     .ib-grid .mud-table-body .mud-table-cell {
-        @apply border-b border-slate-100 py-3 font-sans text-sm text-slate-700;
+        @apply border-b border-slate-100 px-5 py-3.5 font-sans text-sm text-slate-700;
     }
 
     .ib-grid .mud-table-body .mud-table-row:last-child .mud-table-cell {
@@ -212,18 +212,109 @@
         @apply border-t border-slate-200 font-sans text-sm text-slate-500;
     }
 
+    /* Small screens: keep cell content on one line so the table keeps its
+       natural width and scrolls sideways inside .mud-table-container
+       (overflow-x: auto in Mud's own CSS) instead of crushing columns. */
+    .ib-grid .mud-table-cell {
+        @apply whitespace-nowrap;
+    }
+
+    /* Let the pager toolbar wrap on narrow screens instead of overflowing.
+       Desktop stays a single row (nowrap) so Mud's 100%-basis spacer keeps
+       pushing the controls right as designed. */
+    .ib-grid .mud-table-pagination-toolbar {
+        @apply h-auto min-h-14 flex-wrap justify-end gap-y-1 py-1 sm:flex-nowrap;
+    }
+
+    .ib-grid .mud-table-pagination-spacer {
+        @apply hidden sm:block;
+    }
+
+    /* Mud's .mud-input-control ships flex: 1 1 auto. When the toolbar wraps,
+       the rows-per-page select would grow to fill its whole line — and its
+       dropdown popover width-matches the select, ballooning to full width.
+       Keep the select content-sized. */
+    .ib-grid .mud-table-pagination-select {
+        @apply flex-none;
+    }
+
+    /* Popover option lists (MudSelect dropdowns — e.g. the grid pager's
+       rows-per-page menu). Tailwind's preflight zeroes `ul` padding from a
+       later layer than mudblazor, which strips Mud's .mud-list-padding and
+       leaves the options flush against the popover edges. Restore it and
+       align the menu with the design system. Scoped to .mud-paper so
+       non-paper popovers (tooltips) are untouched. */
+    .mud-popover.mud-paper {
+        @apply overflow-hidden rounded-xl border border-slate-200 bg-white shadow-lg;
+    }
+
+    .mud-popover .mud-list {
+        @apply py-1 font-sans;
+    }
+
+    .mud-popover .mud-list-item {
+        @apply px-4 py-2 text-slate-700 transition-colors;
+    }
+
+    .mud-popover .mud-list-item:hover {
+        @apply bg-slate-50;
+    }
+
+    .mud-popover .mud-list-item .mud-typography {
+        @apply font-sans text-sm;
+    }
+
+    .mud-popover .mud-list-item.mud-selected-item {
+        @apply bg-brand-50 text-brand-700;
+    }
+
+    .mud-popover .mud-list-item.mud-selected-item .mud-typography {
+        @apply font-medium;
+    }
+
+    .mud-popover .mud-list-item.mud-selected-item:hover {
+        @apply bg-brand-50;
+    }
+
     /* MudBlazor outlined inputs (MudNumericField etc.) restyled to match
        .form-input — same layering trick as the grid above. */
+    .ib-field.mud-input-control {
+        /* Mud ships `flex: 1 1 auto`, which makes fields grow/shrink inside
+           flex rows (line items) and ignore their w-* utility widths. */
+        @apply flex-none;
+    }
+
     .ib-field .mud-input.mud-input-outlined {
         @apply rounded-lg bg-white font-sans text-sm text-slate-900;
     }
 
     .ib-field .mud-input-outlined-border {
-        @apply rounded-lg border-slate-300;
+        /* `border` (width) is required: Tailwind's preflight zeroes Mud's own
+           1px border because the base layer outranks the mudblazor layer. */
+        @apply rounded-lg border border-slate-300;
     }
 
     .ib-field .mud-input-outlined:focus-within .mud-input-outlined-border {
         @apply border-brand-500;
+    }
+
+    /* Preflight's universal reset (`* { padding: 0 }`) also strips Mud's
+       padding from the inner input and the numeric spin buttons — restore
+       .form-input-like spacing. pr-7 keeps text clear of the spin buttons. */
+    .ib-field .mud-input-outlined input.mud-input-root {
+        @apply px-3 py-2 pr-7;
+    }
+
+    .ib-field .mud-input-numeric-spin {
+        @apply pr-1;
+    }
+
+    .ib-field .mud-input-numeric-spin button {
+        @apply rounded p-0.5 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600;
+    }
+
+    .ib-field .mud-input-numeric-spin .mud-icon-root {
+        @apply h-3.5 w-3.5;
     }
 
     /* Toasts (MudBlazor Snackbar), restyled to match the Tailwind design system.

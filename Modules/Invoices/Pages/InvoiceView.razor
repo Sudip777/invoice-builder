@@ -10,15 +10,15 @@
 }
 else
 {
-    <div class="flex items-center justify-between">
+    <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <a href="/invoices" class="back-link">&larr; Back to Invoices</a>
         <div class="flex gap-3">
-            <a href="@($"/invoices/{Id}/edit")" class="btn-secondary">Edit</a>
-            <a href="@($"/invoices/{Id}/pdf")" target="_blank" class="btn-primary">Download PDF</a>
+            <a href="@($"/invoices/{Id}/edit")" class="btn-secondary flex-1 sm:flex-none">Edit</a>
+            <a href="@($"/invoices/{Id}/pdf")" target="_blank" class="btn-primary flex-1 sm:flex-none">Download PDF</a>
         </div>
     </div>
 
-    <div class="card mx-auto mt-6 max-w-3xl p-8">
+    <div class="card mx-auto mt-6 max-w-3xl p-5 sm:p-8">
         <div class="flex items-start justify-between">
             <div>
                 <h1 class="page-title">INVOICE</h1>
@@ -32,7 +32,7 @@ else
             </div>
         </div>
 
-        <div class="mt-6 grid grid-cols-2 gap-4">
+        <div class="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div class="rounded-lg bg-slate-50 p-4">
                 <p class="eyebrow">From</p>
                 <p class="mt-1 font-semibold text-slate-900">@_invoice.Sender.Name</p>
@@ -69,30 +69,32 @@ else
             </div>
         </div>
 
-        <table class="mt-6 w-full text-sm">
-            <thead>
-                <tr class="border-b border-slate-200 bg-slate-50">
-                    <th class="eyebrow rounded-l-lg px-3 py-2.5 text-left text-slate-500">Item Description</th>
-                    <th class="eyebrow px-3 py-2.5 text-right text-slate-500">Quantity</th>
-                    <th class="eyebrow px-3 py-2.5 text-right text-slate-500">Unit Price</th>
-                    <th class="eyebrow rounded-r-lg px-3 py-2.5 text-right text-slate-500">Total</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var item in _invoice.LineItems)
-                {
-                    <tr class="border-b border-slate-100">
-                        <td class="px-3 py-2 text-slate-700">@item.Description</td>
-                        <td class="px-3 py-2 text-right text-slate-600">@item.Quantity.ToString("N2")</td>
-                        <td class="px-3 py-2 text-right text-slate-600">@item.UnitPrice.ToString("N2") @_invoice.Currency</td>
-                        <td class="px-3 py-2 text-right font-medium text-slate-800">@item.LineTotal.ToString("N2") @_invoice.Currency</td>
+        <div class="mt-6 overflow-x-auto">
+            <table class="w-full text-sm">
+                <thead>
+                    <tr class="border-b border-slate-200 bg-slate-50">
+                        <th class="eyebrow rounded-l-lg px-3 py-2.5 text-left text-slate-500">Item Description</th>
+                        <th class="eyebrow px-3 py-2.5 text-right text-slate-500">Quantity</th>
+                        <th class="eyebrow px-3 py-2.5 text-right text-slate-500">Unit Price</th>
+                        <th class="eyebrow rounded-r-lg px-3 py-2.5 text-right text-slate-500">Total</th>
                     </tr>
-                }
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    @foreach (var item in _invoice.LineItems)
+                    {
+                        <tr class="border-b border-slate-100">
+                            <td class="px-3 py-2 text-slate-700">@item.Description</td>
+                            <td class="px-3 py-2 text-right whitespace-nowrap text-slate-600">@item.Quantity.ToString("N2")</td>
+                            <td class="px-3 py-2 text-right whitespace-nowrap text-slate-600">@item.UnitPrice.ToString("N2") @_invoice.Currency</td>
+                            <td class="px-3 py-2 text-right font-medium whitespace-nowrap text-slate-800">@item.LineTotal.ToString("N2") @_invoice.Currency</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
 
         <div class="mt-4 flex justify-end">
-            <div class="w-64 rounded-lg bg-slate-50 p-4 text-sm">
+            <div class="w-full rounded-lg bg-slate-50 p-4 text-sm sm:w-64">
                 <div class="flex justify-between py-1">
                     <span class="text-slate-500">Subtotal</span>
                     <span class="font-medium text-slate-800">@_invoice.Subtotal.ToString("N2") @_invoice.Currency</span>

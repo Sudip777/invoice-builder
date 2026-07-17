@@ -21,15 +21,11 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContextFactory<ApplicationDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// Module services (one per vertical slice — see Modules/)
 builder.Services.AddScoped<SenderService>();
 builder.Services.AddScoped<CustomerService>();
 builder.Services.AddScoped<InvoiceService>();
 
-// Authentication: external OAuth only (Google; Microsoft handler kept for
-// when an Entra app registration is available), no local passwords. New
-// accounts are auto-provisioned on first sign-in but only for emails that
-// pass AllowedUserPolicy (see appsettings "Authorization" section).
+// External OAuth only (no local passwords); accounts auto-provision on first sign-in when AllowedUserPolicy permits.
 builder.Services.AddSingleton<AllowedUserPolicy>();
 
 builder.Services.AddAuthentication(options =>
@@ -76,20 +72,17 @@ builder.Services.AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuth
 
 builder.Services.AddAuthorization(options =>
 {
-    // Secure by default: every page/endpoint requires a signed-in user
-    // unless it explicitly opts out with [AllowAnonymous].
+    // Everything requires a signed-in user unless it opts out with [AllowAnonymous].
     options.FallbackPolicy = new AuthorizationPolicyBuilder()
         .RequireAuthenticatedUser()
         .Build();
 });
 
-// Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 builder.Services.AddMudServices(config =>
 {
-    // Bottom-right so toasts never sit on top of a page's own "+ New ..."
-    // button, which every list page places top-right.
+    // Bottom-right so toasts don't cover the list pages' top-right "+ New" buttons.
     config.SnackbarConfiguration.PositionClass = Defaults.Classes.Position.BottomRight;
     config.SnackbarConfiguration.PreventDuplicates = true;
     config.SnackbarConfiguration.NewestOnTop = true;
@@ -143,8 +136,7 @@ using (var scope = app.Services.CreateScope())
         db.SaveChanges();
     }
 
-    // Dev-only: seed a test account so the login-gated UI can be exercised
-    // before a real Microsoft Entra app registration is configured.
+    // Dev-only test account for exercising the login-gated UI without real OAuth credentials.
     if (app.Environment.IsDevelopment())
     {
         var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
@@ -161,11 +153,9 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
-// Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error", createScopeForErrors: true);
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 
@@ -176,9 +166,7 @@ app.UseAuthorization();
 
 app.UseAntiforgery();
 
-// Anonymous: static assets, the Blazor render endpoint (per-page auth is
-// enforced inside it by AuthorizeRouteView — see Components/Routes.razor),
-// and the sign-in/sign-out endpoints that establish the auth cookie itself.
+// Anonymous endpoints; per-page auth is enforced by AuthorizeRouteView (Components/Routes.razor).
 app.MapStaticAssets().AllowAnonymous();
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode()
