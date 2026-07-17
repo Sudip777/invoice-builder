@@ -39,6 +39,14 @@
     body {
         @apply bg-slate-50 font-sans text-slate-900 antialiased;
     }
+
+    /* <FocusOnNavigate> (Routes.razor) focuses the page's h1 after navigation
+       for screen readers, which draws the browser's focus rectangle around it.
+       The default template suppressed this in the old static wwwroot/app.css,
+       which the Tailwind build replaced. */
+    h1:focus {
+        @apply outline-none;
+    }
 }
 
 @layer components {
