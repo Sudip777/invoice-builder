@@ -26,7 +26,8 @@ builder.Services.AddScoped<SenderService>();
 builder.Services.AddScoped<CustomerService>();
 builder.Services.AddScoped<InvoiceService>();
 
-// Authentication: Microsoft-account OAuth only, no local passwords. New
+// Authentication: external OAuth only (Google; Microsoft handler kept for
+// when an Entra app registration is available), no local passwords. New
 // accounts are auto-provisioned on first sign-in but only for emails that
 // pass AllowedUserPolicy (see appsettings "Authorization" section).
 builder.Services.AddSingleton<AllowedUserPolicy>();
@@ -45,6 +46,14 @@ builder.Services.AddAuthentication()
             ?? throw new InvalidOperationException("Missing configuration: Authentication:Microsoft:ClientId. Set it via user-secrets or environment variables.");
         options.ClientSecret = builder.Configuration["Authentication:Microsoft:ClientSecret"]
             ?? throw new InvalidOperationException("Missing configuration: Authentication:Microsoft:ClientSecret. Set it via user-secrets or environment variables.");
+        options.SignInScheme = IdentityConstants.ExternalScheme;
+    })
+    .AddGoogle(options =>
+    {
+        options.ClientId = builder.Configuration["Authentication:Google:ClientId"]
+            ?? throw new InvalidOperationException("Missing configuration: Authentication:Google:ClientId. Set it via user-secrets or environment variables.");
+        options.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"]
+            ?? throw new InvalidOperationException("Missing configuration: Authentication:Google:ClientSecret. Set it via user-secrets or environment variables.");
         options.SignInScheme = IdentityConstants.ExternalScheme;
     });
 
