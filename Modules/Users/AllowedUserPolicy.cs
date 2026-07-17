@@ -2,15 +2,20 @@ namespace InvoiceBuilder.Modules.Users;
 
 /// <summary>
 /// Gatekeeper for external sign-in: only emails on the configured allow-list
-/// (exact address or domain) may provision a local account.
+/// (exact address or domain) may provision a local account. Set
+/// "Authorization:AllowAnyUser" to true to let any authenticated Microsoft
+/// account through (the account must still surface an email claim).
 /// </summary>
 public class AllowedUserPolicy
 {
+    private readonly bool _allowAnyUser;
     private readonly HashSet<string> _allowedEmails;
     private readonly HashSet<string> _allowedDomains;
 
     public AllowedUserPolicy(IConfiguration configuration)
     {
+        _allowAnyUser = configuration.GetValue<bool>("Authorization:AllowAnyUser");
+
         _allowedEmails = configuration.GetSection("Authorization:AllowedEmails").Get<string[]>()
             ?.Select(e => e.Trim().ToLowerInvariant())
             .Where(e => e.Length > 0)
@@ -27,6 +32,11 @@ public class AllowedUserPolicy
         if (string.IsNullOrWhiteSpace(email))
         {
             return false;
+        }
+
+        if (_allowAnyUser)
+        {
+            return true;
         }
 
         email = email.Trim().ToLowerInvariant();
