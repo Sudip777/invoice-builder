@@ -37,23 +37,26 @@
                 </button>
             </form>
 
+            @if (Env.IsDevelopment())
+            {
+                <div class="relative mt-6" aria-hidden="true">
+                    <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-slate-200"></div></div>
+                    <div class="relative flex justify-center"><span class="bg-white px-3 text-xs text-slate-400">or</span></div>
+                </div>
+
+                <form method="post" action="Account/DevSignIn" class="mt-6">
+                    <AntiforgeryToken />
+                    <button type="submit" title="@DevAuthEndpoints.TestUserEmail" class="btn-secondary w-full gap-2.5 py-2.5 font-semibold text-slate-800">
+                        <span class="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-brand-100 text-[10px] font-semibold text-brand-700">TU</span>
+                        Continue as Test User
+                    </button>
+                </form>
+            }
+
             <p class="mt-5 text-center text-xs leading-relaxed text-slate-400">
                 By signing in, you agree to use this tool in line with your company's policies.
             </p>
         </div>
-
-        @if (Env.IsDevelopment())
-        {
-            <div class="border-t border-dashed border-slate-200 bg-slate-50/80 px-6 py-4 sm:px-8">
-                <p class="text-center text-[11px] font-semibold tracking-wide text-slate-400 uppercase">Development only</p>
-                <form method="post" action="Account/DevSignIn" class="mt-2.5">
-                    <AntiforgeryToken />
-                    <button type="submit" class="btn-secondary w-full py-2 text-xs text-slate-500">
-                        Continue as @DevAuthEndpoints.TestUserEmail
-                    </button>
-                </form>
-            </div>
-        }
     </div>
 
     <p class="mt-6 flex items-center justify-center gap-1.5 text-center text-xs text-slate-400">
