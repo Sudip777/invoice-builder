@@ -55,18 +55,13 @@
         @apply flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-brand-600 to-violet-600 text-sm font-bold text-white shadow-sm;
     }
 
-    /* Navigation */
-    .nav-link {
-        @apply relative py-1 text-sm font-medium text-slate-600 transition-colors hover:text-brand-600;
+    /* Sidebar nav rail links (Components/Layout/Sidebar.razor) */
+    .sidebar-link {
+        @apply flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900;
     }
 
-    .nav-link.active {
-        @apply font-semibold text-brand-600;
-    }
-
-    .nav-link.active::after {
-        content: "";
-        @apply absolute inset-x-0 -bottom-[21px] h-0.5 rounded-full bg-brand-600;
+    .sidebar-link.active {
+        @apply bg-brand-50 text-brand-700;
     }
 
     /* Buttons */
