@@ -17,35 +17,35 @@
         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
                 <label class="form-label" for="snd-name">Name</label>
-                <input id="snd-name" @bind="_model.Name" placeholder="e.g. My Company LLC" class="form-input" />
+                <input id="snd-name" @bind="_model.Name" @bind:event="oninput" placeholder="e.g. My Company LLC" class="form-input" />
                 <ValidationMessage For="() => _model.Name" class="form-error" />
             </div>
             <div>
                 <label class="form-label" for="snd-contact">Contact Person</label>
-                <input id="snd-contact" @bind="_model.ContactPerson" placeholder="e.g. Alice Smith" class="form-input" />
+                <input id="snd-contact" @bind="_model.ContactPerson" @bind:event="oninput" placeholder="e.g. Alice Smith" class="form-input" />
             </div>
         </div>
 
         <div>
             <label class="form-label" for="snd-address">Address</label>
-            <textarea id="snd-address" @bind="_model.Address" rows="2" placeholder="Street, city, postal code" class="form-input"></textarea>
+            <textarea id="snd-address" @bind="_model.Address" @bind:event="oninput" rows="2" placeholder="Street, city, postal code" class="form-input"></textarea>
             <ValidationMessage For="() => _model.Address" class="form-error" />
         </div>
 
         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
                 <label class="form-label" for="snd-vat">VAT / Tax ID</label>
-                <input id="snd-vat" @bind="_model.VatId" class="form-input" />
+                <input id="snd-vat" @bind="_model.VatId" @bind:event="oninput" class="form-input" />
             </div>
             <div>
                 <label class="form-label" for="snd-iban">IBAN</label>
-                <input id="snd-iban" @bind="_model.Iban" placeholder="XX00 0000 0000 0000 00" class="form-input" />
+                <input id="snd-iban" @bind="_model.Iban" @bind:event="oninput" placeholder="XX00 0000 0000 0000 00" class="form-input" />
             </div>
         </div>
 
         <div class="flex justify-end gap-3 border-t border-slate-100 pt-4">
             <a href="/senders" class="btn-secondary">Cancel</a>
-            <button type="submit" class="btn-primary">Save Sender</button>
+            <button type="submit" class="btn-primary" disabled="@_saving">Save Sender</button>
         </div>
     </EditForm>
 </div>
@@ -53,8 +53,9 @@
 @code {
     [Parameter] public int? Id { get; set; }
     private Sender _model = new();
+    private bool _saving;
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnParametersSetAsync()
     {
         if (Id is int id)
         {
@@ -64,6 +65,8 @@
 
     private async Task Save()
     {
+        if (_saving) return;
+        _saving = true;
         try
         {
             if (_model.Id == 0)
@@ -77,6 +80,10 @@
         catch (Exception ex)
         {
             Snackbar.Add($"Could not save: {ex.Message}", Severity.Error);
+        }
+        finally
+        {
+            _saving = false;
         }
     }
 }

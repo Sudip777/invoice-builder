@@ -13,7 +13,7 @@
     </div>
     <div class="flex gap-3">
         <a href="/invoices" class="btn-secondary">Cancel</a>
-        <button type="submit" form="invoice-form" class="btn-primary">
+        <button type="submit" form="invoice-form" class="btn-primary" disabled="@_saving">
             @(Id is null ? "Create Invoice" : "Save Changes")
         </button>
     </div>
@@ -30,7 +30,7 @@
                     <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                         <div>
                             <label class="form-label" for="inv-number">Invoice Number</label>
-                            <input id="inv-number" @bind="_model.InvoiceNumber" placeholder="e.g. INV-2026-014" class="form-input" />
+                            <input id="inv-number" @bind="_model.InvoiceNumber" @bind:event="oninput" placeholder="e.g. INV-2026-014" class="form-input" />
                             <ValidationMessage For="() => _model.InvoiceNumber" class="form-error" />
                         </div>
                         <div>
@@ -88,7 +88,7 @@
 
                     <div>
                         <label class="form-label" for="inv-notes">Notes</label>
-                        <textarea id="inv-notes" @bind="_model.Notes" rows="2" placeholder="Payment terms, thank-you note…" class="form-input"></textarea>
+                        <textarea id="inv-notes" @bind="_model.Notes" @bind:event="oninput" rows="2" placeholder="Payment terms, thank-you note…" class="form-input"></textarea>
                     </div>
                 </div>
             </div>
@@ -113,7 +113,7 @@
                 <div class="mt-2 space-y-3">
                     @foreach (var item in _model.LineItems)
                     {
-                        <LineItemRow Item="item" OnRemove="() => RemoveItem(item)" OnChanged="StateHasChanged" />
+                        <LineItemRow @key="item" Item="item" OnRemove="() => RemoveItem(item)" OnChanged="StateHasChanged" />
                     }
                     @if (_model.LineItems.Count == 0)
                     {
@@ -139,13 +139,17 @@
     private Invoice _model = new();
     private List<Customer> _customers = new();
     private List<Sender> _senders = new();
+    private bool _saving;
     private static readonly string[] _currencies = ["USD", "EUR", "GBP", "CHF", "AUD", "CAD", "INR", "NPR", "JPY"];
 
     protected override async Task OnInitializedAsync()
     {
         _customers = await InvoiceSvc.GetCustomersAsync();
         _senders = await InvoiceSvc.GetSendersAsync();
+    }
 
+    protected override async Task OnParametersSetAsync()
+    {
         if (Id is int id)
         {
             _model = await InvoiceSvc.GetAsync(id) ?? new();
@@ -163,6 +167,8 @@
 
     private async Task Save()
     {
+        if (_saving) return;
+        _saving = true;
         try
         {
             if (_model.Id == 0)
@@ -176,6 +182,10 @@
         catch (Exception ex)
         {
             Snackbar.Add($"Could not save: {ex.Message}", Severity.Error);
+        }
+        finally
+        {
+            _saving = false;
         }
     }
 }
