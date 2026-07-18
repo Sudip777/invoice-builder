@@ -10,6 +10,7 @@ obj/
 
 # Claude Code config and skills
 .claude/
+.mcp.json
 
 # Node / Tailwind
 node_modules/
