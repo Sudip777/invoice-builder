@@ -317,6 +317,23 @@
         @apply h-3.5 w-3.5;
     }
 
+    /* MudChart (Dashboard) — legend/tooltip text restyled to Inter + slate.
+       Axis/data-point colors come from the MudTheme palette (MainLayout.razor)
+       and each chart's own ChartOptions.ChartPalette, not CSS. */
+    .ib-chart .mud-chart-legend-text {
+        @apply font-sans text-sm text-slate-600;
+    }
+
+    .ib-chart .mud-chart-legend-item {
+        @apply items-center gap-1.5;
+    }
+
+    /* Preflight zeroes the default border-radius Mud uses for donut/pie
+       legend swatches — same layering fix as the numeric spin buttons. */
+    .ib-chart .mud-chart-legend-marker {
+        @apply rounded-full;
+    }
+
     /* Toasts (MudBlazor Snackbar), restyled to match the Tailwind design system.
        Same layering trick as the grid above — components beats mudblazor, so
        these win over MudBlazor's cramped Material padding without !important. */

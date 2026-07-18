@@ -2,6 +2,7 @@ using InvoiceBuilder.Components;
 using InvoiceBuilder.Data;
 using InvoiceBuilder.Models;
 using InvoiceBuilder.Modules.Customers;
+using InvoiceBuilder.Modules.Dashboard;
 using InvoiceBuilder.Modules.Invoices;
 using InvoiceBuilder.Modules.Senders;
 using InvoiceBuilder.Modules.Users;
@@ -24,6 +25,7 @@ builder.Services.AddDbContextFactory<ApplicationDbContext>(options =>
 builder.Services.AddScoped<SenderService>();
 builder.Services.AddScoped<CustomerService>();
 builder.Services.AddScoped<InvoiceService>();
+builder.Services.AddScoped<DashboardService>();
 
 // External OAuth only (no local passwords); accounts auto-provision on first sign-in when AllowedUserPolicy permits.
 builder.Services.AddSingleton<AllowedUserPolicy>();

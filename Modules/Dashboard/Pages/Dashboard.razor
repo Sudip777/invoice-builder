@@ -1,0 +1,142 @@
+@page "/dashboard"
+@inject DashboardService DashboardSvc
+
+<PageTitle>Dashboard · Invoice Builder</PageTitle>
+
+<div>
+    <h1 class="page-title">Dashboard</h1>
+    <p class="page-subtitle">An overview of your invoicing activity.</p>
+</div>
+
+@if (_data is null)
+{
+    <p class="mt-6 text-sm text-slate-500">Loading…</p>
+}
+else
+{
+    <div class="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-4">
+        <div class="stat">
+            <p class="stat-value">@_data.InvoiceCount</p>
+            <p class="stat-label">Invoices</p>
+        </div>
+        <div class="stat">
+            <p class="stat-value">@_data.CustomerCount</p>
+            <p class="stat-label">Customers</p>
+        </div>
+        <div class="stat">
+            <p class="stat-value">@_data.SenderCount</p>
+            <p class="stat-label">Senders</p>
+        </div>
+        <div class="stat">
+            <p class="stat-value">@_data.TotalOutstanding.ToString("N0")</p>
+            <p class="stat-label">Total Outstanding</p>
+        </div>
+    </div>
+
+    <div class="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-3">
+        <div class="card p-6 lg:col-span-2">
+            <h3 class="card-title">Revenue — last 6 months</h3>
+            @if (_data.MonthlyRevenue.All(m => m.Total == 0))
+            {
+                <div class="empty-state">
+                    <p class="empty-state-title">No invoice activity yet</p>
+                    <p class="empty-state-hint">Revenue will chart here once invoices have dates in range.</p>
+                </div>
+            }
+            else
+            {
+                <div class="ib-chart mt-4">
+                    <MudChart T="double" ChartType="ChartType.Line" ChartSeries="@_revenueSeries" ChartLabels="@_revenueLabels"
+                              ChartOptions="@_lineOptions" Width="100%" Height="280px" />
+                </div>
+            }
+        </div>
+
+        <div class="card p-6">
+            <h3 class="card-title">Invoice status</h3>
+            @if (_data.InvoiceCount == 0)
+            {
+                <div class="empty-state">
+                    <p class="empty-state-title">No invoices yet</p>
+                </div>
+            }
+            else
+            {
+                <div class="ib-chart mt-4">
+                    <MudChart T="double" ChartType="ChartType.Donut" ChartSeries="@_statusSeries" ChartLabels="@_statusLabels"
+                              ChartOptions="@_donutOptions" Width="100%" Height="220px" />
+                </div>
+                <div class="mt-4 space-y-2 text-sm">
+                    <div class="flex items-center justify-between">
+                        <span class="flex items-center gap-2 text-slate-600"><span class="h-2.5 w-2.5 rounded-full bg-red-500"></span>Overdue</span>
+                        <span class="font-medium text-slate-900">@_data.OverdueCount</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span class="flex items-center gap-2 text-slate-600"><span class="h-2.5 w-2.5 rounded-full bg-amber-500"></span>Due soon</span>
+                        <span class="font-medium text-slate-900">@_data.DueSoonCount</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span class="flex items-center gap-2 text-slate-600"><span class="h-2.5 w-2.5 rounded-full bg-brand-500"></span>Upcoming</span>
+                        <span class="font-medium text-slate-900">@_data.UpcomingCount</span>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+
+    <div class="card mt-6 overflow-hidden">
+        <div class="flex items-center justify-between border-b border-slate-100 px-5 py-4">
+            <h3 class="card-title">Recent invoices</h3>
+            <a href="/invoices" class="row-action text-brand-600 hover:text-brand-500">View all</a>
+        </div>
+        @if (_data.RecentInvoices.Count == 0)
+        {
+            <div class="empty-state">
+                <p class="empty-state-title">No invoices yet</p>
+                <a href="/invoices/new" class="btn-primary mt-4">+ New Invoice</a>
+            </div>
+        }
+        else
+        {
+            <div class="divide-y divide-slate-100">
+                @foreach (var invoice in _data.RecentInvoices)
+                {
+                    <a href="@($"/invoices/{invoice.Id}")" class="flex items-center justify-between gap-4 px-5 py-3 transition hover:bg-slate-50">
+                        <div class="min-w-0">
+                            <p class="truncate text-sm font-medium text-slate-900">@invoice.InvoiceNumber</p>
+                            <p class="truncate text-xs text-slate-500">@invoice.Customer.Name</p>
+                        </div>
+                        <span class="shrink-0 text-sm font-semibold text-slate-900">@invoice.Total.ToString("N2") <span class="text-xs font-medium text-slate-400">@invoice.Currency</span></span>
+                    </a>
+                }
+            </div>
+        }
+    </div>
+}
+
+@code {
+    private DashboardData? _data;
+    private List<ChartSeries<double>> _revenueSeries = new();
+    private string[] _revenueLabels = [];
+    private List<ChartSeries<double>> _statusSeries = new();
+    private string[] _statusLabels = [];
+
+    // brand-600 for the revenue line; red/amber/brand for the status donut, matching the .badge-* colors.
+    private static readonly LineChartOptions _lineOptions = new() { ChartPalette = ["#4f46e5"] };
+    private static readonly DonutChartOptions _donutOptions = new() { ChartPalette = ["#dc2626", "#d97706", "#4f46e5"] };
+
+    protected override async Task OnInitializedAsync()
+    {
+        _data = await DashboardSvc.GetAsync();
+
+        _revenueLabels = _data.MonthlyRevenue.Select(m => m.Label).ToArray();
+        _revenueSeries = new List<ChartSeries<double>>
+        {
+            new() { Name = "Revenue", Data = _data.MonthlyRevenue.Select(m => (double)m.Total).ToArray() },
+        };
+
+        double[] statusData = [_data.OverdueCount, _data.DueSoonCount, _data.UpcomingCount];
+        _statusSeries = statusData.AsChartDataSet();
+        _statusLabels = ["Overdue", "Due soon", "Upcoming"];
+    }
+}
