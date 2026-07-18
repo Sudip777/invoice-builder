@@ -66,15 +66,15 @@
 
     /* Buttons */
     .btn-primary {
-        @apply inline-flex items-center justify-center gap-1.5 rounded-lg bg-brand-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-600 active:scale-[0.98] active:bg-brand-700;
+        @apply inline-flex items-center justify-center gap-1.5 whitespace-nowrap rounded-lg bg-brand-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-600 active:scale-[0.98] active:bg-brand-700;
     }
 
     .btn-secondary {
-        @apply inline-flex items-center justify-center gap-1.5 rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm transition hover:bg-slate-50 hover:text-slate-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-400 active:scale-[0.98];
+        @apply inline-flex items-center justify-center gap-1.5 whitespace-nowrap rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm transition hover:bg-slate-50 hover:text-slate-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-400 active:scale-[0.98];
     }
 
     .btn-danger {
-        @apply inline-flex items-center justify-center gap-1.5 rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-red-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600 active:scale-[0.98] active:bg-red-700;
+        @apply inline-flex items-center justify-center gap-1.5 whitespace-nowrap rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-red-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600 active:scale-[0.98] active:bg-red-700;
     }
 
     .btn-danger-ghost {
@@ -157,19 +157,6 @@
 
     .empty-state-hint {
         @apply mt-1 text-sm text-slate-400;
-    }
-
-    /* Marketing home: stats & footer */
-    .stat {
-        @apply rounded-2xl border border-slate-200 bg-white p-5 text-center shadow-sm;
-    }
-
-    .stat-value {
-        @apply text-2xl font-extrabold tracking-tight text-slate-900;
-    }
-
-    .stat-label {
-        @apply mt-1 text-sm text-slate-500;
     }
 
     .footer-link {

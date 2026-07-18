@@ -1,0 +1,22 @@
+@* Dashboard stat tile: tinted icon square, label, value — the whole card links to its list page. *@
+
+<a href="@Href" class="card group flex items-center gap-4 p-5 transition hover:border-slate-300 hover:shadow-md">
+    <div class="@($"flex h-11 w-11 shrink-0 items-center justify-center rounded-xl transition group-hover:scale-105 {Tint}")">
+        @Icon
+    </div>
+    <div class="min-w-0">
+        <p class="truncate text-sm font-medium text-slate-500">@Label</p>
+        <p class="mt-0.5 truncate text-2xl font-bold tracking-tight text-slate-900">@Value</p>
+    </div>
+</a>
+
+@code {
+    [Parameter, EditorRequired] public string Label { get; set; } = "";
+    [Parameter, EditorRequired] public string Value { get; set; } = "";
+    [Parameter, EditorRequired] public string Href { get; set; } = "";
+    [Parameter, EditorRequired] public RenderFragment Icon { get; set; } = default!;
+
+    // Tailwind tint utilities for the icon square, e.g. "bg-brand-50 text-brand-600".
+    // Callers must pass literal class strings so the Tailwind scanner picks them up.
+    [Parameter] public string Tint { get; set; } = "bg-brand-50 text-brand-600";
+}
