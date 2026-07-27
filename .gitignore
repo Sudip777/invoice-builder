@@ -32,3 +32,6 @@ publish/
 # OS files
 Thumbs.db
 .DS_Store
+
+# Playwright MCP session artifacts
+.playwright-mcp/
