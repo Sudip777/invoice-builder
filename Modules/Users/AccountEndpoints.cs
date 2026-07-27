@@ -33,7 +33,6 @@ public static class AccountEndpoints
         accountGroup.MapGet("/ExternalLoginCallback", async (
             [FromServices] SignInManager<ApplicationUser> signInManager,
             [FromServices] UserManager<ApplicationUser> userManager,
-            [FromServices] AllowedUserPolicy allowedUsers,
             [FromServices] ILoggerFactory loggerFactory,
             string? returnUrl,
             string? remoteError) =>
@@ -67,11 +66,11 @@ public static class AccountEndpoints
                 return Results.Redirect("/access-denied?reason=locked-out");
             }
 
-            // First-time sign-in: only auto-provision an account for allow-listed emails.
+            // First-time sign-in: provision an account for any Google account with an email claim.
             var email = info.Principal.FindFirstValue(ClaimTypes.Email);
-            if (!allowedUsers.IsAllowed(email))
+            if (string.IsNullOrWhiteSpace(email))
             {
-                logger.LogWarning("Rejected external login for {Email}: not on the allow-list.", email);
+                logger.LogWarning("Rejected external login: no email claim on the external identity.");
                 return Results.Redirect("/access-denied");
             }
 

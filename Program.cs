@@ -27,9 +27,7 @@ builder.Services.AddScoped<CustomerService>();
 builder.Services.AddScoped<InvoiceService>();
 builder.Services.AddScoped<DashboardService>();
 
-// External OAuth only (no local passwords); accounts auto-provision on first sign-in when AllowedUserPolicy permits.
-builder.Services.AddSingleton<AllowedUserPolicy>();
-
+// External OAuth only (no local passwords); accounts auto-provision on first sign-in for any Google account with an email.
 builder.Services.AddAuthentication(options =>
     {
         options.DefaultScheme = IdentityConstants.ApplicationScheme;
@@ -38,14 +36,6 @@ builder.Services.AddAuthentication(options =>
     .AddIdentityCookies();
 
 builder.Services.AddAuthentication()
-    .AddMicrosoftAccount(options =>
-    {
-        options.ClientId = builder.Configuration["Authentication:Microsoft:ClientId"]
-            ?? throw new InvalidOperationException("Missing configuration: Authentication:Microsoft:ClientId. Set it via user-secrets or environment variables.");
-        options.ClientSecret = builder.Configuration["Authentication:Microsoft:ClientSecret"]
-            ?? throw new InvalidOperationException("Missing configuration: Authentication:Microsoft:ClientSecret. Set it via user-secrets or environment variables.");
-        options.SignInScheme = IdentityConstants.ExternalScheme;
-    })
     .AddGoogle(options =>
     {
         options.ClientId = builder.Configuration["Authentication:Google:ClientId"]

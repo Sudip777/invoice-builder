@@ -1,6 +1,6 @@
 # InvoiceBuilder
 
-A full-stack invoicing app built with **.NET 9 Blazor** (Interactive Server). Manage senders, customers, and invoices with line items — then download any invoice as a polished **PDF**. Includes a dashboard with revenue charts, OAuth sign-in (Microsoft / Google), and a Tailwind-styled responsive UI.
+A full-stack invoicing app built with **.NET 9 Blazor** (Interactive Server). Manage senders, customers, and invoices with line items — then download any invoice as a polished **PDF**. Includes a dashboard with revenue charts, Google OAuth sign-in, and a Tailwind-styled responsive UI.
 
 ## Tech Stack
 
@@ -9,7 +9,7 @@ A full-stack invoicing app built with **.NET 9 Blazor** (Interactive Server). Ma
 | UI | Blazor Server (SignalR), Tailwind CSS v4, MudBlazor |
 | Backend | ASP.NET Core (.NET 9), vertical slice architecture |
 | Data | EF Core + SQLite (code-first migrations, auto-applied on startup) |
-| Auth | ASP.NET Core Identity + Microsoft & Google OAuth (no local passwords) |
+| Auth | ASP.NET Core Identity + Google OAuth (no local passwords) |
 | PDF | QuestPDF |
 
 ## Architecture
@@ -54,7 +54,7 @@ Key design decisions:
 
 ```mermaid
 flowchart LR
-    A[Sign in<br/>Microsoft / Google] --> B[Create sender<br/>& customer]
+    A[Sign in<br/>Google] --> B[Create sender<br/>& customer]
     B --> C[Build invoice<br/>line items · tax · currency]
     C --> D[Validate & save<br/>EditForm + DataAnnotations]
     D --> E[Dashboard<br/>stats & charts]
@@ -65,8 +65,8 @@ flowchart LR
 
 ```powershell
 npm install        # Tailwind CLI (build shells out to it)
-dotnet user-secrets set "Authentication:Microsoft:ClientId" "<id>"
-dotnet user-secrets set "Authentication:Microsoft:ClientSecret" "<secret>"
+dotnet user-secrets set "Authentication:Google:ClientId" "<id>"
+dotnet user-secrets set "Authentication:Google:ClientSecret" "<secret>"
 dotnet run         # http://localhost:5036
 ```
 
