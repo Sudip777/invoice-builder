@@ -95,36 +95,192 @@ using (var scope = app.Services.CreateScope())
     {
         var sender = new Sender
         {
-            Name = "My Company LLC",
-            ContactPerson = "Alice Smith",
-            Address = "456 Market St, City",
-            VatId = "TAX-987654",
-            Iban = "XX00 0000 0000 0000 00",
-        };
-        var customer = new Customer
-        {
-            Name = "ACME Corp",
-            ContactPerson = "John Doe",
-            Address = "123 Main St, City, 12345",
-            Email = "john.doe@example.com",
-            VatId = "VAT-123456",
+            Name = "Northwind Digital Studio",
+            ContactPerson = "Alice Reinholt",
+            Address = "88 Birch Avenue, Suite 200, Portland, OR 97204",
+            VatId = "US-91-2837465",
+            Iban = "US64 SVBK 1000 0001 2345 6789",
         };
         db.Senders.Add(sender);
-        db.Customers.Add(customer);
+
+        var customers = new List<Customer>
+        {
+            new()
+            {
+                Name = "Acme Corporation",
+                ContactPerson = "John Doe",
+                Address = "123 Main St, Springfield, IL 62701",
+                Email = "john.doe@acmecorp.com",
+                VatId = "US-12-3456789",
+            },
+            new()
+            {
+                Name = "Bluewave Logistics",
+                ContactPerson = "Maria Chen",
+                Address = "47 Harbor Rd, Seattle, WA 98101",
+                Email = "maria.chen@bluewavelogistics.com",
+                VatId = "US-45-6789012",
+            },
+            new()
+            {
+                Name = "Terra Nova Landscaping",
+                ContactPerson = "Diego Alvarez",
+                Address = "910 Meadow Ln, Austin, TX 78701",
+                Email = "diego@terranovalandscaping.com",
+                VatId = "US-78-9012345",
+            },
+            new()
+            {
+                Name = "Silverline Consulting Group",
+                ContactPerson = "Priya Natarajan",
+                Address = "22 Fifth Ave, Floor 14, New York, NY 10010",
+                Email = "priya.natarajan@silverlineconsulting.com",
+                VatId = "US-33-4455667",
+            },
+        };
+        db.Customers.AddRange(customers);
         db.SaveChanges();
 
-        db.Invoices.Add(new Invoice
+        var today = DateOnly.FromDateTime(DateTime.Today);
+
+        var invoices = new List<Invoice>
         {
-            InvoiceNumber = "INV-2026-001",
-            SenderId = sender.Id,
-            CustomerId = customer.Id,
-            TaxRate = 8.5m,
-            LineItems = new List<InvoiceLineItem>
+            new()
             {
-                new() { Description = ".NET Book", Quantity = 1, UnitPrice = 29.99m },
-                new() { Description = ".NET Course", Quantity = 1, UnitPrice = 89.99m },
+                InvoiceNumber = "INV-2026-014",
+                SenderId = sender.Id,
+                CustomerId = customers[0].Id,
+                InvoiceDate = today.AddDays(-3),
+                DueDate = today.AddDays(11),
+                TaxRate = 8.5m,
+                Notes = "Thank you for your business!",
+                LineItems =
+                [
+                    new() { Description = "Website redesign — homepage & product pages", Quantity = 1, UnitPrice = 4200m },
+                    new() { Description = "Mobile responsive QA pass", Quantity = 8, UnitPrice = 95m },
+                ],
             },
-        });
+            new()
+            {
+                InvoiceNumber = "INV-2026-013",
+                SenderId = sender.Id,
+                CustomerId = customers[1].Id,
+                InvoiceDate = today.AddDays(-9),
+                DueDate = today.AddDays(5),
+                TaxRate = 0m,
+                Notes = "Net 14. Wire transfer preferred.",
+                LineItems =
+                [
+                    new() { Description = "Fleet tracking dashboard — Phase 2", Quantity = 1, UnitPrice = 6800m },
+                    new() { Description = "API integration with carrier partners", Quantity = 20, UnitPrice = 110m },
+                ],
+            },
+            new()
+            {
+                InvoiceNumber = "INV-2026-012",
+                SenderId = sender.Id,
+                CustomerId = customers[2].Id,
+                InvoiceDate = today.AddDays(-20),
+                DueDate = today.AddDays(-6),
+                TaxRate = 6.25m,
+                Notes = "Past due — please remit payment at your earliest convenience.",
+                LineItems =
+                [
+                    new() { Description = "Seasonal landscaping crew — March", Quantity = 40, UnitPrice = 65m },
+                    new() { Description = "Irrigation system repair", Quantity = 1, UnitPrice = 380m },
+                ],
+            },
+            new()
+            {
+                InvoiceNumber = "INV-2026-011",
+                SenderId = sender.Id,
+                CustomerId = customers[3].Id,
+                InvoiceDate = today.AddDays(-35),
+                DueDate = today.AddDays(-21),
+                TaxRate = 8.5m,
+                Notes = "Thank you for your business!",
+                LineItems =
+                [
+                    new() { Description = "Change management workshop (2 days)", Quantity = 2, UnitPrice = 1500m },
+                    new() { Description = "Executive coaching session", Quantity = 3, UnitPrice = 450m },
+                ],
+            },
+            new()
+            {
+                InvoiceNumber = "INV-2026-010",
+                SenderId = sender.Id,
+                CustomerId = customers[0].Id,
+                InvoiceDate = today.AddDays(-52),
+                DueDate = today.AddDays(-38),
+                TaxRate = 8.5m,
+                Notes = "Thank you for your business!",
+                LineItems =
+                [
+                    new() { Description = "Quarterly maintenance retainer", Quantity = 1, UnitPrice = 1200m },
+                ],
+            },
+            new()
+            {
+                InvoiceNumber = "INV-2026-009",
+                SenderId = sender.Id,
+                CustomerId = customers[1].Id,
+                InvoiceDate = today.AddDays(-68),
+                DueDate = today.AddDays(-54),
+                TaxRate = 0m,
+                Notes = "Net 14. Wire transfer preferred.",
+                LineItems =
+                [
+                    new() { Description = "Warehouse inventory sync tool", Quantity = 1, UnitPrice = 5400m },
+                    new() { Description = "On-site training (1 day)", Quantity = 1, UnitPrice = 900m },
+                ],
+            },
+            new()
+            {
+                InvoiceNumber = "INV-2026-008",
+                SenderId = sender.Id,
+                CustomerId = customers[2].Id,
+                InvoiceDate = today.AddDays(-95),
+                DueDate = today.AddDays(-81),
+                TaxRate = 6.25m,
+                Notes = "Thank you for your business!",
+                LineItems =
+                [
+                    new() { Description = "Spring cleanup & mulching", Quantity = 1, UnitPrice = 640m },
+                    new() { Description = "Tree trimming (5 trees)", Quantity = 5, UnitPrice = 85m },
+                ],
+            },
+            new()
+            {
+                InvoiceNumber = "INV-2026-007",
+                SenderId = sender.Id,
+                CustomerId = customers[3].Id,
+                InvoiceDate = today.AddDays(-120),
+                DueDate = today.AddDays(-106),
+                TaxRate = 8.5m,
+                Notes = "Thank you for your business!",
+                LineItems =
+                [
+                    new() { Description = "Org design assessment", Quantity = 1, UnitPrice = 3200m },
+                ],
+            },
+            new()
+            {
+                InvoiceNumber = "INV-2026-006",
+                SenderId = sender.Id,
+                CustomerId = customers[0].Id,
+                InvoiceDate = today.AddDays(-140),
+                DueDate = today.AddDays(-126),
+                TaxRate = 8.5m,
+                Notes = "Thank you for your business!",
+                LineItems =
+                [
+                    new() { Description = "Checkout flow redesign", Quantity = 1, UnitPrice = 2950m },
+                    new() { Description = "A/B testing setup", Quantity = 6, UnitPrice = 95m },
+                ],
+            },
+        };
+
+        db.Invoices.AddRange(invoices);
         db.SaveChanges();
     }
 
