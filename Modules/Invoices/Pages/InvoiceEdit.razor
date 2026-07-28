@@ -30,7 +30,7 @@
                     <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                         <div>
                             <label class="form-label" for="inv-number">Invoice Number</label>
-                            <input id="inv-number" @bind="_model.InvoiceNumber" @bind:event="oninput" placeholder="e.g. INV-2026-014" class="form-input" />
+                            <input id="inv-number" value="@_model.InvoiceNumber" disabled="@(Id is null)" placeholder="e.g. INV-2026-014" class="form-input disabled:cursor-not-allowed disabled:bg-slate-50 disabled:text-slate-500" />
                             <ValidationMessage For="() => _model.InvoiceNumber" class="form-error" />
                         </div>
                         <div>
@@ -153,6 +153,13 @@
         if (Id is int id)
         {
             _model = await InvoiceSvc.GetAsync(id) ?? new();
+        }
+        else
+        {
+            if (string.IsNullOrEmpty(_model.InvoiceNumber))
+            {
+                _model.InvoiceNumber = await InvoiceSvc.GetNextInvoiceNumberAsync();
+            }
         }
 
         if (string.IsNullOrWhiteSpace(_model.Currency) || !_currencies.Contains(_model.Currency))

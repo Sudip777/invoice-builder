@@ -43,6 +43,28 @@ public class InvoiceService(IDbContextFactory<ApplicationDbContext> factory)
         return await db.Senders.AsNoTracking().OrderBy(s => s.Name).ToListAsync();
     }
 
+    // Next sequential number in the "INV-{year}-{seq}" format used by seed data and existing
+    // invoices — scoped per current year so numbering restarts each year rather than growing forever.
+    public async Task<string> GetNextInvoiceNumberAsync()
+    {
+        await using var db = factory.CreateDbContext();
+        var year = DateTime.Today.Year;
+        var prefix = $"INV-{year}-";
+
+        var maxSeq = await db.Invoices
+            .Where(i => i.InvoiceNumber.StartsWith(prefix))
+            .Select(i => i.InvoiceNumber)
+            .AsNoTracking()
+            .ToListAsync();
+
+        var nextSeq = maxSeq
+            .Select(n => int.TryParse(n.AsSpan(prefix.Length), out var seq) ? seq : 0)
+            .DefaultIfEmpty(0)
+            .Max() + 1;
+
+        return $"{prefix}{nextSeq:D3}";
+    }
+
     public async Task<int> CreateAsync(Invoice invoice)
     {
         await using var db = factory.CreateDbContext();
