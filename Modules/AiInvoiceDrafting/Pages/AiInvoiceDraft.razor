@@ -1,0 +1,186 @@
+@page "/ai-invoice-draft"
+@inject GeminiInvoiceDraftService DraftService
+@inject AiDraftLookupService LookupSvc
+@inject DraftInvoiceHandoff Handoff
+@inject NavigationManager Nav
+@inject ISnackbar Snackbar
+
+<PageTitle>AI Invoice Draft · Invoice Builder</PageTitle>
+
+<div>
+    <h1 class="page-title">AI Invoice Draft</h1>
+    <p class="page-subtitle">Describe the invoice in plain English and review an editable draft before creating it.</p>
+</div>
+
+<div class="card mt-6 p-6">
+    <label class="form-label" for="ai-request">What do you want to invoice?</label>
+    <textarea id="ai-request" @bind="_request" @bind:event="oninput" @bind:after="ClearValidationError" rows="3"
+              placeholder="e.g. Bill Acme Corp for 10 hours of consulting at $150/hr, due in 2 weeks"
+              class="form-input"></textarea>
+
+    @if (_validationError is not null)
+    {
+        <p class="form-error mt-2">@_validationError</p>
+    }
+
+    <div class="mt-4 flex justify-end">
+        <button type="button" class="btn-primary" disabled="@_generating" @onclick="Generate">
+            @(_generating ? "Generating…" : "Generate Draft")
+        </button>
+    </div>
+</div>
+
+@if (_draft is not null)
+{
+    <div class="card mt-6 p-6">
+        <h3 class="card-title">Draft preview</h3>
+        <p class="mt-1 text-sm text-slate-500">Nothing has been saved yet — review below, then continue to the invoice editor to confirm.</p>
+
+        <div class="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <div>
+                <span class="form-label">Customer</span>
+                <p class="mt-1 text-sm font-medium text-slate-800">
+                    @_draft.CustomerName
+                    @if (_matchedCustomer is not null)
+                    {
+                        <span class="ml-2 rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-semibold text-emerald-700">matched existing</span>
+                    }
+                    else
+                    {
+                        <span class="ml-2 rounded-full bg-amber-50 px-2 py-0.5 text-xs font-semibold text-amber-700">no match — pick or create in editor</span>
+                    }
+                </p>
+            </div>
+            <div>
+                <span class="form-label">Tax rate</span>
+                <p class="mt-1 text-sm font-medium text-slate-800">@_draft.TaxRate.ToString("N2")%</p>
+            </div>
+            <div>
+                <span class="form-label">Invoice date</span>
+                <p class="mt-1 text-sm font-medium text-slate-800">@(_draft.InvoiceDate?.ToString("yyyy-MM-dd") ?? "—")</p>
+            </div>
+            <div>
+                <span class="form-label">Due date</span>
+                <p class="mt-1 text-sm font-medium text-slate-800">@(_draft.DueDate?.ToString("yyyy-MM-dd") ?? "—")</p>
+            </div>
+        </div>
+
+        <div class="mt-4">
+            <span class="form-label">Line items</span>
+            <div class="mt-2 space-y-2">
+                @foreach (var item in _draft.LineItems)
+                {
+                    <div class="flex items-center justify-between rounded-lg border px-3 py-2 text-sm @(item.UnitPrice <= 0 ? "border-amber-300 bg-amber-50" : "border-slate-200")">
+                        <span class="flex-1">
+                            @item.Description
+                            @if (item.UnitPrice <= 0)
+                            {
+                                <span class="ml-2 rounded-full bg-amber-100 px-2 py-0.5 text-xs font-semibold text-amber-800">needs a price</span>
+                            }
+                        </span>
+                        <span class="w-16 text-right text-slate-500">@item.Quantity.ToString("N2")</span>
+                        <span class="w-24 text-right text-slate-500">@item.UnitPrice.ToString("N2")</span>
+                        <span class="w-24 text-right font-semibold text-slate-800">@((item.Quantity * item.UnitPrice).ToString("N2"))</span>
+                    </div>
+                }
+            </div>
+            @if (_draft.LineItems.Any(li => li.UnitPrice <= 0))
+            {
+                <p class="mt-2 text-sm text-amber-700">
+                    Some line items are missing a price — the request likely didn't give the AI enough
+                    information to compute one. You'll be able to fill it in on the invoice editor.
+                </p>
+            }
+        </div>
+
+        <div class="mt-6 flex justify-end gap-3">
+            <button type="button" class="btn-secondary" @onclick="Reset">Discard</button>
+            <button type="button" class="btn-primary" @onclick="ContinueToEditor">Continue to Invoice Editor</button>
+        </div>
+    </div>
+}
+
+@code {
+    private const int MinRequestLength = 15;
+
+    private string _request = "";
+    private bool _generating;
+    private string? _validationError;
+    private DraftInvoiceResult? _draft;
+    private Customer? _matchedCustomer;
+
+    private async Task Generate()
+    {
+        if (_generating) return;
+
+        _validationError = Validate(_request);
+        if (_validationError is not null)
+        {
+            _draft = null;
+            return;
+        }
+
+        _generating = true;
+        _draft = null;
+        try
+        {
+            var knownCustomerNames = await LookupSvc.GetCustomerNamesAsync();
+            var draft = await DraftService.DraftAsync(_request, knownCustomerNames);
+
+            // The AI may still come back with nothing usable for a vague/off-topic request —
+            // treat an empty extraction as a failure rather than showing an empty draft.
+            if (string.IsNullOrWhiteSpace(draft.CustomerName) && draft.LineItems.Count == 0)
+            {
+                Snackbar.Add(
+                    "Couldn't find a customer or any line items in that request — try including who you're billing and what for.",
+                    Severity.Warning);
+                return;
+            }
+
+            _draft = draft;
+            _matchedCustomer = await LookupSvc.FindCustomerByNameAsync(draft.CustomerName);
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Could not generate draft: {ex.Message}", Severity.Error);
+        }
+        finally
+        {
+            _generating = false;
+        }
+    }
+
+    // Cheap client-side gate before spending an API call — catches obviously incomplete
+    // requests (blank, too short, or missing both a customer and any billable item).
+    private static string? Validate(string request)
+    {
+        if (string.IsNullOrWhiteSpace(request))
+        {
+            return "Describe what you want to invoice first.";
+        }
+
+        if (request.Trim().Length < MinRequestLength)
+        {
+            return "That's too short to work with — include who you're billing and what for.";
+        }
+
+        return null;
+    }
+
+    private void ClearValidationError() => _validationError = null;
+
+    private void Reset()
+    {
+        _draft = null;
+        _matchedCustomer = null;
+        _validationError = null;
+        _request = "";
+    }
+
+    private void ContinueToEditor()
+    {
+        if (_draft is null) return;
+        Handoff.Set(_draft);
+        Nav.NavigateTo("/invoices/new");
+    }
+}

@@ -1,11 +1,13 @@
 using InvoiceBuilder.Components;
 using InvoiceBuilder.Data;
 using InvoiceBuilder.Models;
+using InvoiceBuilder.Modules.AiInvoiceDrafting;
 using InvoiceBuilder.Modules.Customers;
 using InvoiceBuilder.Modules.Dashboard;
 using InvoiceBuilder.Modules.Invoices;
 using InvoiceBuilder.Modules.Senders;
 using InvoiceBuilder.Modules.Users;
+using InvoiceBuilder.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -26,6 +28,13 @@ builder.Services.AddScoped<SenderService>();
 builder.Services.AddScoped<CustomerService>();
 builder.Services.AddScoped<InvoiceService>();
 builder.Services.AddScoped<DashboardService>();
+
+// Modules/AiInvoiceDrafting — calls the Gemini API (free tier) to turn a plain-English
+// request into an editable invoice draft; DraftInvoiceHandoff carries the result into the
+// existing invoice editor without the two slices referencing each other's services.
+builder.Services.AddHttpClient<GeminiInvoiceDraftService>();
+builder.Services.AddScoped<AiDraftLookupService>();
+builder.Services.AddScoped<DraftInvoiceHandoff>();
 
 // External OAuth only (no local passwords); accounts auto-provision on first sign-in for any Google account with an email.
 builder.Services.AddAuthentication(options =>
